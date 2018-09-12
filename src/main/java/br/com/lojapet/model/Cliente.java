@@ -1,5 +1,6 @@
 package br.com.lojapet.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
@@ -46,8 +49,10 @@ public class Cliente {
 	@NotEmpty
 	private String nomeCompleto;
 
-	@DateTimeFormat
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Calendar dataNascimento;
+	
 	private String sexo;
 	private String telefone;
 	private String celular;
@@ -80,7 +85,7 @@ public class Cliente {
 
 	@OneToMany
 	@JoinColumn(name = "cliente_venda_id", foreignKey = @ForeignKey(name = "cliente_venda_fk"))
-	private List<Venda> vendas;
+	private List<Venda> vendas = new ArrayList<>();
 	
 //	@OneToMany
 //	@JoinColumn(name = "cliente_divida_id", foreignKey = @ForeignKey(name = "cliente_divida_fk"))
@@ -102,6 +107,10 @@ public class Cliente {
 		} else {
 			this.cnpj = cnpj;
 		}
+	}
+
+	public void addVenda(Venda vendaPersistida) {
+		this.vendas.add(vendaPersistida);
 	}
 
 }

@@ -31,19 +31,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Builder
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_por_username", columnNames = { "username" }))
-public class User  implements UserDetails {
-	
+public class User implements UserDetails {
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -51,37 +49,34 @@ public class User  implements UserDetails {
 	@GeneratedValue(generator = "UUID")
 	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
 	private UUID id;
-	
+
 	@NotEmpty
 	private String username;
 	@NotEmpty
 	private String password;
 	@NotEmpty
 	private String nome;
-	
+
 	@DateTimeFormat
 	private Calendar ultimoLogin;
 
-	
 	@OneToMany
-	@JoinColumn(name = "usuario_venda_id", foreignKey = @ForeignKey(name = "usuario_venda_FK"))
-	private List<Venda> listaVenda;
-	
-	
-	
+	@JoinColumn(name = "usuario_venda_id", foreignKey = @ForeignKey(name = "venda_usuario_fk"))
+	private List<Venda> listaVenda = new ArrayList<>();
+
+	@OneToMany
+	@JoinColumn(name = "usuario_compra_id", foreignKey = @ForeignKey(name = "compra_usuario_fk"))
+	private List<Compra> listaCompra = new ArrayList<>();
+
+	@OneToMany
+	@JoinColumn(name = "usuario_caixa_id", foreignKey = @ForeignKey(name = "caixa_usuario_fk"))
+	private List<Caixa> listaDeCaixa;
+
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@JoinTable(
-	        name = "user_role",
-	        joinColumns = @JoinColumn(name = "user_id"),
-	        inverseJoinColumns = @JoinColumn(name = "role_id"),
-	        		indexes = {
-	        		        @Index(name = "user_fk", columnList = "user_id"),
-	        		        @Index(name = "role_fk", columnList = "role_id")
-	        		    }
-	)
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"), indexes = {
+			@Index(name = "user_fk", columnList = "user_id"), @Index(name = "role_fk", columnList = "role_id") })
 	private List<Role> authorities = new ArrayList<Role>();
-	
-	
+
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
@@ -102,6 +97,16 @@ public class User  implements UserDetails {
 		return true;
 	}
 
+	public void addVenda(Venda vendaPersistida) {
+		listaVenda.add(vendaPersistida);
+	}
 
+	public void addCaixa(Caixa caixa) {
+		listaDeCaixa.add(caixa);
+	}
+
+	public void addCompra(Compra compraPersistida) {
+		listaCompra.add(compraPersistida);
+	}
 
 }

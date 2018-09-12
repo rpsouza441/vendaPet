@@ -12,12 +12,7 @@
 <customTags:page title="${title}"  cadastroGrupo="active">
 	<jsp:attribute name="extraScripts">
 <!-- Focus no input -->
-										<script>
-											$(document).ready(function() {
-												$('#nome').focus();
-											});
-										</script>
-										
+<script src="/resources/extras/js/focusPrimeiroInput.js"></script>										
 										
 </jsp:attribute>
 <jsp:body>
@@ -28,8 +23,9 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
+        <li class="active"><a href="#"><fmt:message key="navegacao.estoque" /></a></li>
         <li class="active"><a href="#"><fmt:message key="navegacao.cadastro" /></a></li>
-        <li class="active"><a href="/grupo/cadastro"><fmt:message key="navegacao.grupo" /></a></li>
+        <li class="active"><a href="/grupo"><fmt:message key="navegacao.grupo" /></a></li>
       </ol>
     </section>
 

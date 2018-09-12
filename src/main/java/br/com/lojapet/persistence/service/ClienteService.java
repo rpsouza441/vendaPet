@@ -78,5 +78,18 @@ public class ClienteService {
 			e.printStackTrace();
 		}
 	}
+	public List<String> getClienteByNameLike(String clienteNome) {
+		return dao.autocomplete(clienteNome);
+	}
+	public List<Cliente> getListClienteByNameLike(String parameter) {
+		// TODO Auto-generated method stub
+		return dao.findByNomeCompletoIgnoreCaseContaining(parameter);
+	}
+	public boolean existsById(UUID id) {
+		if(id!=null) {
+			return dao.existsById(id);
+		}
+		return false;
+	}
 
 }

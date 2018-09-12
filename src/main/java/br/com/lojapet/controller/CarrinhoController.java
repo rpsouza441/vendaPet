@@ -1,7 +1,6 @@
 package br.com.lojapet.controller;
 
-import java.math.BigDecimal;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -13,20 +12,37 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.Gson;
+
+import br.com.lojapet.model.Caixa;
 import br.com.lojapet.model.Carrinho;
 import br.com.lojapet.model.CarrinhoItem;
+import br.com.lojapet.model.Cliente;
+import br.com.lojapet.model.FormaDePagamento;
+import br.com.lojapet.model.MovimentoDeCaixa;
+import br.com.lojapet.model.OrigemMovimento;
+import br.com.lojapet.model.Pagamento;
 import br.com.lojapet.model.Produto;
+import br.com.lojapet.model.TipoDeMovimentacao;
+import br.com.lojapet.model.User;
 import br.com.lojapet.model.Venda;
-import br.com.lojapet.persistence.service.CarteiraService;
+import br.com.lojapet.persistence.service.CaixaService;
+import br.com.lojapet.persistence.service.ClienteService;
+import br.com.lojapet.persistence.service.MovimentoDeCaixaService;
 import br.com.lojapet.persistence.service.ProdutoService;
+import br.com.lojapet.persistence.service.UserService;
 import br.com.lojapet.persistence.service.VendaService;
+import net.bytebuddy.implementation.bytecode.collection.ArrayAccess;
 
 @Controller
 @RequestMapping(value = "/carrinho")
@@ -34,16 +50,25 @@ import br.com.lojapet.persistence.service.VendaService;
 public class CarrinhoController {
 
 	@Autowired
-	protected VendaService vendaService;
+	private UserService userService;
 
 	@Autowired
-	protected CarteiraService carteiraService;
+	protected VendaService vendaService;
 
 	@Autowired
 	protected ProdutoService produtoService;
 
 	@Autowired
 	private Carrinho carrinho;
+
+	@Autowired
+	private CaixaService caixaService;
+
+	@Autowired
+	private MovimentoDeCaixaService movimentoDeCaixaService;
+
+	@Autowired
+	private ClienteService clienteService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView home(ModelAndView modelAndView) {
@@ -75,8 +100,6 @@ public class CarrinhoController {
 			// @AuthenticationPrincipal Usuario usuario,
 			HttpServletRequest request) {
 
-		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("redirect:/", "redirect:/produto/procurarProduto");
-
 		// Sabendo que é para atualizar, você manda ele de volta para o carrinho. Se ele
 		// não entrar aqui, é porque ele clicou em Finalizar.
 		if (request.getParameter("atualizar") != null) {
@@ -89,36 +112,99 @@ public class CarrinhoController {
 				i++;
 			}
 			return new ModelAndView("redirect:/carrinho");
-			
+
 		} else if (request.getParameter("orcamento") != null) {
 			return new ModelAndView("redirect:/carrinho/gerarOrcamento");
-
+			/*
+			 * To-Do esta quebrado
+			 */
 		}
 
 		return new ModelAndView("redirect:/carrinho/fecharVenda");
 
 	}
+
 	@RequestMapping(value = "/limparCarrinho", method = RequestMethod.GET)
 	public ModelAndView limparCarrinho() {
-			carrinho.limpaCarrinho();
+		carrinho.limpaCarrinho();
 		return new ModelAndView("redirect:/carrinho");
-		
+
 	}
 
 	@RequestMapping(value = "fecharVenda")
 	public ModelAndView fecharVenda(Venda venda) {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
 				"redirect:/produto/procurarProduto");
+		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
-		venda.setDataEmissao(Calendar.getInstance());
-		BigDecimal total = carrinho.getValorTotal();
-		venda.setValorVenda(total);
-		venda.setValorDesconto(BigDecimal.ZERO);
-		venda.setValorFinal(total);
-		venda.setParcela(1);
+		venda.montaVenda(carrinho.getValorTotal());
+		venda.setParcelas(1);
+
 		modelAndView.addObject("venda", venda);
 
 		return modelAndView;
+	}
+
+	@RequestMapping(value = "fecharVenda", method = RequestMethod.POST)
+	public ModelAndView atualizaFecharVenda(Venda venda) {
+		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
+				"redirect:/produto/procurarProduto");
+		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
+
+		venda.montaVenda(carrinho.getValorTotal());
+
+		modelAndView.addObject("venda", venda);
+
+		return modelAndView;
+	}
+
+	@RequestMapping(value = "finalizarVenda")
+	public ModelAndView finalizarVenda(Venda venda, BindingResult result, HttpServletRequest request) {
+
+		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("redirect:/", "redirect:/produto/procurarProduto");
+		if (carrinho.getItens().isEmpty()) {
+			return modelAndView;
+		}
+		if (request.getParameter("gerarParcelas") != null) {
+			venda.gerarParcelas();
+			return atualizaFecharVenda(venda);
+
+		}
+
+		verificaSeClientePossuIDESeExiste(venda, result);
+
+		if (result.hasErrors()) {
+			return atualizaFecharVenda(venda);
+		}
+
+		persisteVenda(venda);
+		carrinho.limpaCarrinho();
+
+		return modelAndView;
+	}
+
+	private void verificaSeClientePossuIDESeExiste(Venda venda, BindingResult result) {
+		if ((!(venda.getCliente().getNomeCompleto() == null || venda.getCliente().getNomeCompleto() == ""))
+				&& venda.getCliente().getId() == null) {
+			if (!clienteService.existsById(venda.getCliente().getId())) {
+				result.rejectValue("cliente", "field.required");
+			}
+		}
+	}
+	//
+
+	@RequestMapping(value = "search", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> search(HttpServletRequest request) {
+		return clienteService.getClienteByNameLike(request.getParameter("term"));
+	}
+
+	@RequestMapping(value = "searchAjax", method = RequestMethod.GET)
+	@ResponseBody
+	public String searchAjax(HttpServletRequest request) {
+		Gson gson = new Gson();
+
+		return gson.toJson(clienteService.getListClienteByNameLike(request.getParameter("keyword")));
 	}
 
 	@RequestMapping(value = "gerarOrcamento")
@@ -126,30 +212,88 @@ public class CarrinhoController {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/gerar_orcamento",
 				"redirect:/produto/procurarProduto");
 
-		venda.setDataEmissao(Calendar.getInstance());
-		BigDecimal total = carrinho.getValorTotal();
-		venda.setValorVenda(total);
-		venda.setValorDesconto(BigDecimal.ZERO);
-		venda.setValorFinal(total);
-		venda.setParcela(1);
+		// montaVendaParaPaginaDeFinalizarVenda(venda);
 		modelAndView.addObject("venda", venda);
 
 		return modelAndView;
 	}
 
-	@RequestMapping(value = "finalizarVenda")
-	public ModelAndView finalizarVenda(Venda venda) {
-		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("redirect:/", "redirect:/produto/procurarProduto");
+	private void persisteVenda(Venda vendaASerPersistida) {
+		Cliente cliente = null;
+		if(vendaASerPersistida.getCliente().getId()!= null) {
+			 cliente = clienteService.getClienteById(vendaASerPersistida.getCliente().getId());
+		}
 
-		Venda vendaASerPersistida = new Venda();
+		List<Produto> produtos = extraiListaDeProdutosEQuantidadeDoCarrinho();
+
+		Caixa caixaAberto = caixaService.getCaixaAberto();
+
+		User logado = retornaUsuarioLogado();
+		
+		vendaASerPersistida.preparaVendaParaPersistir(produtos, logado, cliente);
+
+		Venda vendaPersistida = vendaService.saveVendaWithReturn(vendaASerPersistida);
+
+		removeQuantidadeDoEstoqueELigaVendaCom(caixaAberto, vendaPersistida, logado, cliente);
+	}
+
+	private void removeQuantidadeDoEstoqueELigaVendaCom(Caixa caixaAberto, Venda vendaPersistida,
+			User logado, Cliente cliente) {
+		resolveLigacoesCaixaMovimento(caixaAberto, vendaPersistida);
+		logado.addVenda(vendaPersistida);
+		
+		System.out.println(vendaPersistida.getCliente());
+		if(vendaPersistida.getCliente()!=null) {
+			cliente.addVenda(vendaPersistida);
+			clienteService.updateCliente(cliente);
+		}
+		
+		userService.updateUser(logado);
+		caixaService.updateCaixa(caixaAberto);
+		produtoService.removeQuantidade(carrinho.getUuidEQuantidade());
+	}
+
+	private void resolveLigacoesCaixaMovimento(Caixa caixaAberto, Venda vendaPersistida) {
+		List<MovimentoDeCaixa> movimentoEntrada = geraMovimentoDeCaixaDeVenda(vendaPersistida, caixaAberto);
+		List<MovimentoDeCaixa> movimentoDeCaixaPersistido = movimentoDeCaixaService
+				.saveMovimentoDeCaixaWithReturn(movimentoEntrada);
+		caixaAberto.addListaMovimentacao(movimentoDeCaixaPersistido);
+	}
+
+	private List<MovimentoDeCaixa> geraMovimentoDeCaixaDeVenda(Venda v, Caixa caixaAberto) {
+		List<MovimentoDeCaixa> listaMovimento = new ArrayList<MovimentoDeCaixa>();
+		for (Pagamento p : v.getContaAReceber()) {
+			System.out.println(p.getTotal());
+			listaMovimento.add(MovimentoDeCaixa.builder()
+					.dataHoraMovimento(v.getDataEmissao())
+					.valor(p.getTotal())
+					.observacao(v.getDadosCliente())
+					.formaDePagamento(p.getFormaDePagamento())
+					.origemMovimento(OrigemMovimento.VENDA)
+					.tipoDeMovimentacao(TipoDeMovimentacao.ENTRADA)
+					.user(v.getUser())
+					.caixa(caixaAberto)
+					.build());
+		}
+		
+
+		return listaMovimento;
+	}
+
+	private List<Produto> extraiListaDeProdutosEQuantidadeDoCarrinho() {
 		Collection<CarrinhoItem> itens = carrinho.getItens();
 		List<Produto> produtos = itens.stream().map(CarrinhoItem::getProduto).collect(Collectors.toList());
+		return produtos;
+	}
 
-		vendaASerPersistida.preencheVenda(venda, produtos, null, null);
-		produtoService.removeQuantidade(carrinho.getUuidEQuantidade());
-		vendaService.saveVenda(vendaASerPersistida);
-		carrinho.limpaCarrinho();
+	private ModelAndView redirecionaSeCarrinhoEstaVazio(String urlSePreenchido, String urlSeVazio) {
+		ModelAndView modelAndView;
+		if (carrinho.getItens().isEmpty()) {
+			modelAndView = new ModelAndView(urlSeVazio);
+		} else {
+			modelAndView = new ModelAndView(urlSePreenchido);
 
+		}
 		return modelAndView;
 	}
 
@@ -159,17 +303,30 @@ public class CarrinhoController {
 		return item;
 	}
 
-	private ModelAndView redirecionaSeCarrinhoEstaVazio(String urlSePreenchido, String urlSeVazio) {
-
-		ModelAndView modelAndView;
-		if (!carrinho.getItens().isEmpty()) {
-			modelAndView = new ModelAndView(urlSePreenchido);
-		} else {
-			return new ModelAndView(urlSeVazio);
-
-		}
-		return modelAndView;
+	private User retornaUsuarioLogado() {
+		User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return userService.getUserById(principal.getId());
 	}
+
+	// @RequestMapping(value = "search", method = RequestMethod.GET)
+	// public @ResponseBody List<Cliente> getCliente(@RequestParam String
+	// clienteNome) {
+	// System.out.println("aqui");
+	// return clienteService.getClienteByNameLike(clienteNome);
+	//
+	//
+	// }
+	//
+	// @RequestMapping(value = "search", method = RequestMethod.GET)
+	// @ResponseBody
+	// public List<String> search(HttpServletRequest request) {
+	// System.out.println("aqui");
+	// ObjectMapper mapper = new ObjectMapper();
+	// List<Cliente> list =
+	// clienteService.getClienteByNameLike(request.getParameter("term"));
+	// List<String> jsonRetorno = mapper.writeValueAsString(list);
+	// return jsonRetorno;
+	// }
 
 	// @RequestMapping(value = "/book/search", method = { RequestMethod.GET })
 	// public Collection<Book> list(@ModelAttribute("bookSearchCriteria")

@@ -14,6 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import br.com.lojapet.facade.XmlFacade;
+import br.com.lojapet.model.Compra;
+import br.com.lojapet.model.Fornecedor;
 import br.com.lojapet.model.Produto;
 import br.com.lojapet.model.xml.XmlParaProduto;
 
@@ -23,9 +26,9 @@ public class XMLExtractor {
 	@Autowired
 	private HttpServletRequest request;
 
-	public List<Produto> read(MultipartFile file) {
+	public XmlFacade read(MultipartFile file) {
 		try {
-			
+
 			// objetos para construir e fazer a leitura do documento
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = null;
@@ -45,18 +48,17 @@ public class XMLExtractor {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+
 			XmlParaProduto xmlParaProduto = new XmlParaProduto(doc);
-			List<Produto> produtos = xmlParaProduto.constroiProduto();
-			
-			return  produtos;
+
+			XmlFacade xmlFacade = new XmlFacade(xmlParaProduto.constroiProduto(), xmlParaProduto.getNomeFornecedor(),
+					xmlParaProduto.getAtributosBasicosCompra());
+
+			return xmlFacade;
 
 		} catch (IllegalStateException | IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
-	
 
 }

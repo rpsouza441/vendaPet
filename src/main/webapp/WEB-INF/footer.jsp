@@ -34,7 +34,6 @@
 <script src="/resources/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
 <!-- daterangepicker -->
 <script src="/resources/bower_components/moment/min/moment.min.js"></script>
-<script src="/resources/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
 <!-- Bootstrap WYSIHTML5 -->
 <script src="/resources/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 <!-- Slimscroll -->

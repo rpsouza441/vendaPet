@@ -28,6 +28,16 @@ public class VendaService {
 			e.printStackTrace();
 		}
 	}
+	
+	@Transactional
+	public Venda saveVendaWithReturn(Venda venda) {
+		try {
+			return dao.save(venda);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public List<Venda> getAllVendas() {
 		try {

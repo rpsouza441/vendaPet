@@ -14,6 +14,12 @@ public interface ClienteRepository  extends JpaRepository<Cliente, UUID> {
 	
 	@Query("SELECT c FROM Cliente c where c.nomeCompleto like %:keyword%")
 	public List<Cliente> search(@Param("keyword") String keyword);
+
+	public List<Cliente> findByNomeCompletoIgnoreCaseContaining(String clienteNome);
+	
+	
+	@Query("SELECT nomeCompleto FROM Cliente where nomeCompleto like %:keyword%")
+	public List<String> autocomplete(@Param("keyword") String keyword);
 	
 
 }

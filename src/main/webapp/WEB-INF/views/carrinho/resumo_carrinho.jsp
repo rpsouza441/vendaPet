@@ -32,7 +32,19 @@ console.log(max_chars);
             	    }
             });
   </script>
+  
+  <!-- datetimepicker -->
+    <link rel="stylesheet" href="/resources/bower_components/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css">
+<script src="/resources/bower_components/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="/resources/bower_components/moment/src/moment.js"></script>
+ <script>
 
+ </script>
+.ready(
+		function() {
+			
+			   $('.dataPicker').datetimepicker({locale: 'pt-br'});
+		});
 </jsp:attribute>
 
 <jsp:body>
@@ -43,6 +55,7 @@ console.log(max_chars);
       </h1>
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
+        <li class="active"><a href=""><fmt:message key="navegacao.atendimento" /></a></li>
         <li class="active"><a href="/carrinho"><fmt:message key="navegacao.venda" /></a></li>
       </ol>
     </section>
@@ -68,6 +81,7 @@ console.log(max_chars);
  <c:if test="${carrinho.total >0}">	
 		<form:form action="${s:mvcUrl('CC#finalizar').build()}" method="post"
 		modelAttribute="itensCarrinho" >
+
 <div class="col-xs-12">
  
 		<table class="table table-condensed">
@@ -90,6 +104,7 @@ console.log(max_chars);
 					   <input  min="0"
 						 id="quantidade" name="quantidade" cancelable="true" max="${item.produto.quantidade }"
 						value="${carrinho.getQuantidade(item) }" />
+					   
 					</td>
 					
 						
@@ -125,7 +140,7 @@ console.log(max_chars);
 		<div class="col-xs-6">
 		</div>
 		<div class="col-xs-6">
-		 <h2 id="cart-title"><fmt:message key="navegacao.orcamento" /></h2>
+		 <h2 id="cart-title"><fmt:message key="carrinho.resumo" /></h2>
 		<table class="table  table-hover">
 			<tr>
 			<th width="30%"><fmt:message key="carrinho.td.total" /></th> 
@@ -139,7 +154,7 @@ console.log(max_chars);
 						
 						<td colspan="1">
 						
-				  <button class="btn btn-primary" type="submit" name="orcamento">
+				  <button class="btn btn-primary " type="submit" name="orcamento">
 				    <i class="fa  fa-print"></i>
 				    	<fmt:message key="carrinho.orcamento" />
 				    	 </button>  
@@ -151,9 +166,9 @@ console.log(max_chars);
 						
 						<td colspan="1">
 						
-				   <button class="btn btn-primary btn-lg pull-left" type="submit">
+				   <button class="btn btn-block btn-primary btn-lg pull-left" type="submit">
 				    <i class="glyphicon glyphicon-ok"></i>
-				    	<fmt:message key="carrinho.adicionarProduto" />
+				    	<fmt:message key="carrinho.button.fechar" />
 				    	 </button> 
 				    	 
 				    	 

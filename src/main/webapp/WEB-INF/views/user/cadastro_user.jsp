@@ -13,12 +13,7 @@
 
 	<jsp:attribute name="extraScripts">
 <!-- Focus no input -->
-										<script>
-											$(document).ready(function() {
-												$('#nome').focus();
-											});
-										</script>
-										
+<script src="/resources/extras/js/focusPrimeiroInput.js"></script>
 										
 </jsp:attribute>
 

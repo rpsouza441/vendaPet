@@ -13,57 +13,20 @@
 
 <jsp:attribute name="extraScripts">
 <!-- Focus no input -->
-										<script>
-                                        $(document).ready(function() {
-                                        	$('#nome').focus();
-                                        });
-                                        </script>
-										
+<script src="/resources/extras/js/focusPrimeiroInput.js"></script>
+
  <!-- toggle -->
   <link href="/resources/plugins/bootstrap-toggle/bootstrap-toggle.min.css" rel="stylesheet">
   <script src="/resources/plugins/bootstrap-toggle/bootstrap-toggle.min.js"></script>
 
-     <link href="/resources/dist/css/centerModal.css" rel="stylesheet">
 
 <script src="/resources/bower_components/maskmoney/jquery.maskMoney.js"></script>
- <script>
- 
- $(function() {
-	    $('.money').maskMoney({prefix:'R$ ', allowNegative: false, thousands:'.', decimal:',', affixesStay: false});
-	  })
- </script>
 
 
-
-<!-- previne que ENTER submeta o formulario -->
-<script>
-$(document).ready(function() {
-
-    $(window).keydown(function(event){
-
-        if((event.keyCode == 13) && ($(event.target)[0]!=$("textarea")[0])) {
-
-            event.preventDefault();
-
-            return false;
-
-        }
-
-    });
-
-});
-</script>
 
 
  <!-- InputMask -->
   <script src="/resources/plugins/jquerymask/jquery.mask.js"></script>
-     <!-- input mask -->
-  <script>
-  $(document).ready(function(){
-	  $('.percent').mask('##0,00', {reverse: true});
-  });
-  
- </script>
  
    <script src="/resources/extras/js/cadprod.js"></script>
  
@@ -82,6 +45,7 @@ $(document).ready(function() {
       </h1>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
+        <li class="active"><a href="#"><fmt:message key="navegacao.estoque" /></a></li>
         <li class="active"><a href="#"><fmt:message key="navegacao.cadastro" /></a></li>
         <li class="active"><a href="/produto/cadastro"><fmt:message key="navegacao.produto" /></a></li>
       </ol>

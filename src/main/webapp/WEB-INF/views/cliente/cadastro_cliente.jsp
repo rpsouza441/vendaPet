@@ -15,10 +15,7 @@
                                     <jsp:attribute name="extraScripts">
 										
 										<!-- Focus no input -->
-										<script>
-                                        $(document).ready(function() {
-                                        	$('#nomeCompleto').focus();
-                                        });
+										<script src="/resources/extras/js/focusPrimeiroInput.js"></script>
                                         </script>
 										
                                         <!-- toggle -->
@@ -207,18 +204,10 @@
                                                 <fmt:message key="cliente.cadastro.h3" />
                                             </h1>
                                             <ol class="breadcrumb">
-                                                <li><a href="/"><i class="fa fa-dashboard"></i>
-													<fmt:message key="navegacao.home" /></a></li>
-                                                <li class="active">
-                                                    <a href="#">
-                                                        <fmt:message key="navegacao.cadastro" />
-                                                    </a>
-                                                </li>
-                                                <li class="active">
-                                                    <a href="/cliente/cadastro">
-                                                        <fmt:message key="navegacao.cliente" />
-                                                    </a>
-                                                </li>
+                                                 <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
+											        <li class="active"><a href="#"><fmt:message key="navegacao.atendimento" /></a></li>
+											        <li class="active"><a href="#"><fmt:message key="navegacao.cadastro" /></a></li>
+											        <li class="active"><a href="/cliente"><fmt:message key="navegacao.cliente" /></a></li>
                                             </ol>
                                         </section>
 

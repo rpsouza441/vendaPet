@@ -1,5 +1,6 @@
 package br.com.lojapet;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,18 +12,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.lojapet.model.Carteira;
 import br.com.lojapet.model.Cliente;
-import br.com.lojapet.model.DespesaAPagar;
 import br.com.lojapet.model.Fornecedor;
 import br.com.lojapet.model.Grupo;
-import br.com.lojapet.model.Periodicidade;
+import br.com.lojapet.model.Produto;
 import br.com.lojapet.model.Role;
 import br.com.lojapet.model.User;
-import br.com.lojapet.persistence.service.CarteiraService;
 import br.com.lojapet.persistence.service.ClienteService;
 import br.com.lojapet.persistence.service.FornecedorService;
 import br.com.lojapet.persistence.service.GrupoService;
+import br.com.lojapet.persistence.service.ProdutoService;
 import br.com.lojapet.persistence.service.RoleService;
 import br.com.lojapet.persistence.service.UserService;
 
@@ -35,20 +34,19 @@ public class PopuladorDeBanco implements CommandLineRunner{
 	
 	@Autowired private GrupoService grupoService;
 	@Autowired private FornecedorService fornecedorService;
-	@Autowired private CarteiraService carteiraService;
 	@Autowired private RoleService roleService;
 	@Autowired private UserService userService;
 	@Autowired private ClienteService clienteService;
+	@Autowired private ProdutoService produtoService;
 
 	
 	
 	
 	public PopuladorDeBanco( GrupoService grupoService,
-			FornecedorService fornecedorService, CarteiraService carteiraService, RoleService roleService,
+			FornecedorService fornecedorService,  RoleService roleService,
 			UserService userService) {
 		this.grupoService = grupoService;
 		this.fornecedorService = fornecedorService;
-		this.carteiraService = carteiraService;
 		this.roleService = roleService;
 		this.userService = userService;
 	}
@@ -65,12 +63,13 @@ public class PopuladorDeBanco implements CommandLineRunner{
 			this.fornecedorService.saveFornecedor(f);
 		}
 		
-		for (Carteira c : populaCarteira()) {
-			this.carteiraService.saveCarteira(c);
-		}
 		
 		for (Role r : populaRole()) {
 			this.roleService.saveRole(r);
+		}
+		for (Produto p : populaProduto()) {
+			this.produtoService.saveProduto(p);
+			;
 		}
 		
 		for (User u : populaUser()) {
@@ -129,6 +128,21 @@ public class PopuladorDeBanco implements CommandLineRunner{
 		return grupos;
 	}
 	
+	private List<Produto> populaProduto(){
+		List<Produto> produtos = new ArrayList<>();
+		produtos = Arrays.asList(Produto.builder().nome("Sache de petisto")
+												.estaAtivo(true).quantidade(10)
+												.valorVenda(new BigDecimal(7))
+												.build(),
+								Produto.builder().nome("Remedio Anti pulgas")
+												.estaAtivo(true)
+												.quantidade(30)
+												.valorVenda(new BigDecimal(25))
+												.build()
+								);
+		return produtos;
+	}
+	
 	
 	private List<Fornecedor> populaFornecedor(){
 		List<Fornecedor> fornecedor = new ArrayList<>();
@@ -138,17 +152,11 @@ public class PopuladorDeBanco implements CommandLineRunner{
 		return fornecedor;
 	}
 	
-	private List<Carteira> populaCarteira(){
-		List<Carteira> carteira = new ArrayList<>();
-		carteira = Arrays.asList(Carteira.builder().nome("Principal").build(), 
-								Carteira.builder().nome("Fundo de Reserva").build(),
-								Carteira.builder().nome("Caixa 2").build());
-		return carteira;
-	}
 	
 	private List<Role> populaRole(){
 		List<Role> role = new ArrayList<>();
-		role = Arrays.asList(Role.builder().authority("ADMIN").build(), 
+		role = Arrays.asList(Role.builder().authority("ADMIN").build(),
+							Role.builder().authority("VENDOR").build(),
 							Role.builder().authority("USER").build());
 		return role;
 	}
@@ -168,14 +176,6 @@ public class PopuladorDeBanco implements CommandLineRunner{
 				User.builder().nome("Usuário").username("user").password(new BCryptPasswordEncoder().encode("user")).authorities(Arrays.asList(Role.builder().authority("USER").build())).build(),
 				User.builder().nome("Usuário2").username("user2").password(new BCryptPasswordEncoder().encode("user2")).authorities(Arrays.asList(Role.builder().authority("USER").build())).build());
 		return cliente;
-	}
-	
-	private List<DespesaAPagar> populaDespesaAPagar(){
-		List<DespesaAPagar> despesaAPagar = new ArrayList<>();
-		DespesaAPagar despesaAPagar2= new DespesaAPagar();
-		despesaAPagar2.setPeriodicidade(Periodicidade.Anual);
-		
-		return despesaAPagar;
 	}
 
 	

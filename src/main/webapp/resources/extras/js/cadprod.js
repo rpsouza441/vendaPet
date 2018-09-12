@@ -58,15 +58,33 @@
 
    });
    
-   $( document ).ready(function() {
-		
-		// Customer-Form submit
-		$('#modalProdutoEstoque').on("click",function(){
-			
-			
+   $(function() {
+		$('.money').maskMoney({
+			prefix : 'R$ ',
+			allowNegative : false,
+			thousands : '.',
+			decimal : ',',
+			affixesStay : false
+		});
+	});
    
-			});
+   <!-- previne que ENTER submeta o formulario -->
+   $(document).ready(function() {
+
+       $(window).keydown(function(event){
+
+           if((event.keyCode == 13) && ($(event.target)[0]!=$("textarea")[0])) {
+
+               event.preventDefault();
+
+               return false;
+
+           }
+
+       });
+
    });
+
    
 //   $( document ).ready(function() {
 //		

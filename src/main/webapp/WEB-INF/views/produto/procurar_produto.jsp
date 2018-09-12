@@ -14,25 +14,8 @@
 	<!-- DataTables -->
 	<script src="/resources/bower_components/datatables.net/js/jquery.dataTables.min.js" type="text/javascript"></script>
 	<script src="/resources/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
-<script>
-  $(function () {
-    $('#example2').DataTable({
-      'paging'      : true,
-      'lengthChange': false,
-      'searching'   : false,
-      'ordering'    : true,
-      'info'        : true,
-      'autoWidth'   : false,
-      "language": {
-    	    "paginate": {
-    	      "previous": "<fmt:message key='navegacao.anterior' />",
-    	      "next": "<fmt:message key='navegacao.proximo' />"
-    	    }
-    	  }
-    })
-  })
-</script>
-	
+	<script src="/resources/extras/js/configDateTable.js"></script>
+
 	
 	<script src="/resources/plugins/validate/validator.js" type="text/javascript"></script>
 
@@ -46,7 +29,8 @@
       </h1>
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
-        <li class="active"><a href="/produto/procurarProduto"><fmt:message key="navegacao.procurarProduto" /></a></li>
+        <li><a href="/"><fmt:message key="navegacao.atendimento" /></a></li>
+        <li class="active"><a href="/produto/procurarProduto"><fmt:message key="navegacao.venda" /></a></li>
       </ol>
     </section>
 

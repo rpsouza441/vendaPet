@@ -9,56 +9,15 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <fmt:message key="grupo.lista.title" var="title" />
-<customTags:page title="${title}" listaGrupo="active" >
+<customTags:page title="${title}" cadastroGrupo="active" >
 <jsp:attribute name="extraScripts">
 	<!-- DataTables -->
 	<script src="/resources/bower_components/datatables.net/js/jquery.dataTables.min.js" type="text/javascript"></script>
 	<script src="/resources/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
 
-<script>
-	$(function() {
-		$('#example2')
-				.DataTable(
-						{
-							'paging' : true,
-							'lengthChange' : false,
-							'searching' : false,
-							'ordering' : true,
-							'info' : true,
-							'autoWidth' : false,
-							'language' : {
-								"sEmptyTable" : "Nenhum registro encontrado",
-								"sInfo" : "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-								"sInfoEmpty" : "Mostrando 0 até 0 de 0 registros",
-								"sInfoFiltered" : "(Filtrados de _MAX_ registros)",
-								"sInfoPostFix" : "",
-								"sInfoThousands" : ".",
-								"sLengthMenu" : "_MENU_ resultados por página",
-								"sLoadingRecords" : "Carregando...",
-								"sProcessing" : "Processando...",
-								"sZeroRecords" : "Nenhum registro encontrado",
-								"sSearch" : "Pesquisar",
-								"oPaginate" : {
-									"sNext" : "Próximo",
-									"sPrevious" : "Anterior",
-									"sFirst" : "Primeiro",
-									"sLast" : "Último"
-								},
-								"oAria" : {
-									"sSortAscending" : ": Ordenar colunas de forma ascendente",
-									"sSortDescending" : ": Ordenar colunas de forma descendente"
-								},
-								"select" : {
-									"rows" : {
-										"_" : "Selecionado %d linhas",
-										"0" : "Nenhuma linha selecionada",
-										"1" : "Selecionado 1 linha"
-									}
-								}
-							}
-						})
-	})
-</script>
+	<script src="/resources/extras/js/configDateTable.js"></script>
+
+
 	<script src="/resources/plugins/validate/validator.js"
 			type="text/javascript"></script>
 
@@ -72,7 +31,8 @@
       </h1>
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
-        <li class="active"><a href="#"><fmt:message key="navegacao.lista" /></a></li>
+        <li class="active"><a href="#"><fmt:message key="navegacao.estoque" /></a></li>
+        <li class="active"><a href="#"><fmt:message key="navegacao.cadastro" /></a></li>
         <li class="active"><a href="/grupo"><fmt:message key="navegacao.grupo" /></a></li>
       </ol>
     </section>
@@ -94,6 +54,22 @@
 								action="${s:mvcUrl('GC#listaComSearch').build() }"
 								id="form_search" method="post" modelAttribute="search"
 								autocomplete="off" data-toggle="validator">
+								
+					<div class="col-xs-6">
+						<div class="form-group">
+						
+						<a  rel="tooltip" class="btn btn-success btn-block" id="edit_event"  
+						 href="<s:url value='/grupo/cadastro' />">
+							 <span class="glyphicon glyphicon-plus pull-left"></span> 
+							   <fmt:message key="grupo.adicionar" />
+						</a>
+						
+						
+					      </div>
+				      
+				    </div>
+								
+								
 				    <div class="col-xs-6">
 						<div class="form-group">
 						      <div class="input-group ">

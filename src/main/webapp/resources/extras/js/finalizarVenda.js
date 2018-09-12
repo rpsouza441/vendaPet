@@ -1,3 +1,5 @@
+
+
 function moedaParaNumero(valor) {
 	return isNaN(valor) == false ? parseFloat(valor) : parseFloat(valor
 			.replace("R$", "").replace(".", "").replace(",", "."));
@@ -30,28 +32,60 @@ $(document).on("change", "#parcela", function() {
 
 });
 
-$(document).on("change", "#valorDesconto", function() {
+$(document).on("change", "#desconto", function() {
 
-	var venda = moedaParaNumero($('#valorVenda').val());
-	var desconto = moedaParaNumero($('#valorDesconto').val());
-
-	if (venda > 0 && desconto > 1) {
+	var venda = moedaParaNumero($('#subtotal').val());
+	var desconto = moedaParaNumero($('#desconto').val());
+	var parcela = $('#parcelas').val();
+	
+	
+	if (venda > 0 && desconto > 0) {
 		var total = venda - desconto;
-		$('#valorFinal').val(numeroParaMoeda(total.toFixed(2)));
+		var totalParcelado = total / parcela;
+		
+		$('#total').val(numeroParaMoeda(total.toFixed(2)));
+		
+		$(".totalParcelado").each(function(){
+			$(this).val(numeroParaMoeda(totalParcelado.toFixed(2)));
+       });
+	}
+	
+	if (isNaN(desconto)) {
+		var total = venda;
+		var totalParcelado = total / parcela;
+		
+		$('#total').val(numeroParaMoeda(total.toFixed(2)));
+		
+		$(".totalParcelado").each(function(){
+			$(this).val(numeroParaMoeda(totalParcelado.toFixed(2)));
+		});
 	}
 
 });
 
-$(document).on("change", "#valorFinal", function() {
+$(document).on("change", "#total", function() {
 
-	var venda = moedaParaNumero($('#valorVenda').val());
-	var valorFinal = moedaParaNumero($('#valorFinal').val());
+	var venda = moedaParaNumero($('#subtotal').val());
+	var valorFinal = moedaParaNumero($('#total').val());
+	var parcela = $('#parcelas').val();
 
 	if (venda > 0 && valorFinal > 0) {
 		var total = venda - valorFinal;
-		$('#valorDesconto').val(numeroParaMoeda(total.toFixed(2)));
+		$('#desconto').val(numeroParaMoeda(total.toFixed(2)));
+
+		$(".totalParcelado").each(function(){
+			$(this).val(numeroParaMoeda(totalParcelado.toFixed(2)));
+       });
 	}
 
+});
+$(document).on("change", "#input-search", function() {
+	if(!$(this).val()){
+		$("#idCliente").val("");
+		
+	} 
+	
+	
 });
 
 $("input[name='parcela']").TouchSpin({
@@ -71,22 +105,61 @@ $(function() {
 	});
 });
 
+$("input[name='parcelas']").TouchSpin({
+    min: 1,
+    max:12
+    
+});
+
+
+
 $(document)
 
 .ready(
 		function() {
-			var date_input = $('.dataPicker'); // our date input has the name
-												// "dataPicker"
-			var container = $('.bootstrap-iso form').length > 0 ? $(
-					'.bootstrap-iso form').parent() : "body";
-			var options = {
-				format : 'dd/mm/yyyy',
-				language : "pt-BR",
-				container : container,
-				todayHighlight : true,
-				autoclose : true,
-				orientation : 'bottom',
-
-			};
-			date_input.datepicker(options);
+			
+			   $('.dateTimePicker').datetimepicker({
+				   locale: 'pt-br',
+				   
+				   
+			    });
+			   var date_input = $('.datePicker'); //our date input has the name "dataPicker"
+               var container = $('.bootstrap-iso form').length > 0 ? $(
+                       '.bootstrap-iso form').parent() :
+                   "body";
+               var options = {
+                   format: 'dd/mm/yyyy',
+                   language: "pt-BR",
+                   container: container,
+                   todayHighlight: true,
+                   autoclose: true,
+                   orientation: 'bottom',
+                   
+               };
+               date_input.datepicker(options);
+			   
+			  
 		});
+$(document)
+
+.ready(
+		function() { 
+			var parcelas= $('#parcelas').val();
+			if(parcelas>1){
+				$('#input-search').attr("required", true);
+				
+			}
+			
+			
+			
+		});
+
+
+
+
+//
+//$(document).ready(function() {
+//	$('#input-search').autocomplete({
+//		source : '${pageContext.request.contextPath }/carrinho/search'
+//	});
+//});

@@ -10,11 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.lojapet.model.Compra;
-import br.com.lojapet.model.Fornecedor;
-import br.com.lojapet.model.Produto;
 import br.com.lojapet.persistence.repository.CompraRepository;
-import br.com.lojapet.persistence.repository.FornecedorRepository;
-import br.com.lojapet.persistence.repository.ProdutoRepository;
 
 @Service
 @Transactional
@@ -22,12 +18,6 @@ public class CompraService {
 
 	@Autowired
 	private CompraRepository dao;
-
-	@Autowired
-	private FornecedorService fornecedorService;
-
-	@Autowired
-	private ProdutoService produtoService;
 
 	@Transactional
 	public void saveCompra(Compra compra) {
@@ -39,6 +29,18 @@ public class CompraService {
 	}
 
 	@Transactional
+	public Compra saveCompraWithReturn(Compra compra) {
+		try {
+			return dao.save(compra);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+
+	}
+
+	@Transactional
 	public void saveCompra(List<Compra> compras) {
 		for (Compra c : compras) {
 			try {
@@ -47,21 +49,6 @@ public class CompraService {
 				e.printStackTrace();
 			}
 
-		}
-
-	}
-
-	@Transactional
-	public void saveCompra(Compra compra, UUID fornecedor, List<Produto> produtos) {
-		Fornecedor fornecedorById = fornecedorService.getFornecedorById(fornecedor);
-		List<Produto> saveProdutoWithReturn = produtoService.saveProdutoWithReturn(produtos, fornecedorById);
-
-		compra.setProduto(saveProdutoWithReturn);
-
-		try {
-			dao.save(compra);
-		} catch (DataAccessException e) {
-			e.printStackTrace();
 		}
 
 	}

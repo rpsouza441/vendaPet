@@ -15,12 +15,7 @@
 <jsp:attribute name="extraScripts">
 
 <!-- Focus no input -->
-										<script>
-                                        $(document).ready(function() {
-                                        	$('#nome').focus();
-                                        });
-                                        </script>
-										
+<script src="/resources/extras/js/focusPrimeiroInput.js"></script>
 
  <!-- InputMask -->
   <script src="/resources/plugins/jquerymask/jquery.mask.js"></script>

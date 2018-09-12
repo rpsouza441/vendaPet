@@ -1,6 +1,7 @@
 package br.com.lojapet.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,14 +61,14 @@ public class Produto {
 	private int maxEstoque;
 
 	@NumberFormat(style = Style.NUMBER)
-	private BigDecimal valorCusto = BigDecimal.ZERO;
+	private BigDecimal valorCusto ;
 
 	@NotNull
 	@NumberFormat(style = Style.NUMBER)
-	private BigDecimal valorVenda = BigDecimal.ZERO;
+	private BigDecimal valorVenda ;
 
 	@NumberFormat(style = Style.NUMBER)
-	private BigDecimal margemLucro = BigDecimal.ZERO;
+	private BigDecimal margemLucro ;
 
 	private String fabricante;
 
@@ -87,12 +88,11 @@ public class Produto {
 	@JoinTable(name = "produto_fornecedor", joinColumns = @JoinColumn(name = "produto_fornecedor_id"), inverseJoinColumns = @JoinColumn(name = "fornecedor_produto_id"), indexes = {
 			@Index(name = "produto_fornecedor_fk", columnList = "produto_fornecedor_id"),
 			@Index(name = "fornecedor_produto_fk", columnList = "fornecedor_produto_id") })
-	private List<Fornecedor> fornecedores;
+	private List<Fornecedor> fornecedores = new ArrayList<Fornecedor>();
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "compra_produto_id", foreignKey = @ForeignKey(name = "compra_fk"))
-	private Compra compra;
-
+	@ManyToMany(mappedBy = "listaProduto", fetch = FetchType.LAZY)
+	private List<Compra> listaCompra;
+	
 	@ManyToMany(mappedBy = "listaProduto", fetch = FetchType.LAZY)
 	private List<Venda> listaVenda;
 	
@@ -101,7 +101,14 @@ public class Produto {
 	}
 
 	public void removeQuantidade(int quantidadeASerRemovida) {
-		quantidade= quantidade-quantidadeASerRemovida;
+		this.quantidade= this.quantidade-quantidadeASerRemovida;
+	}
+	public void adicionaQuantidade(int quantidadeASerRemovida) {
+		this.quantidade= this.quantidade+quantidadeASerRemovida;
+	}
+
+	public void addFornecedor(Fornecedor fornecedorPersistido) {
+		fornecedores.add(fornecedorPersistido);
 	}
 
 

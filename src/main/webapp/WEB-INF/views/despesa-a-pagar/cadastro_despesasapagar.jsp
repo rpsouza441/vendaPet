@@ -9,15 +9,10 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <fmt:message key="despesa.cadastro.title" var="title" />
-<customTags:page title="${title}"  cadastroDespesaAPagar="active">
+<customTags:page title="${title}"  cadastroDespesa="active">
 	<jsp:attribute name="extraScripts">
 <!-- Focus no input -->
-										<script>
-											$(document).ready(function() {
-												$('#nome').focus();
-											});
-										</script>
-										
+<script src="/resources/extras/js/focusPrimeiroInput.js"></script>		
 										
 <!--  TouchSPin -->
  <script src="/resources/plugins/touchspin/jquery.bootstrap-touchspin.js"></script>
@@ -44,19 +39,7 @@
  </script>
  
  
- 
- 
- 
- 
-  <!-- Date Picker -->
-  <link rel="stylesheet" href="/resources/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
-  <!-- Daterange picker -->
-  <link rel="stylesheet" href="/resources/bower_components/bootstrap-daterangepicker/daterangepicker.css">
-  
-<script src="/resources/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-  <script src="/resources/bower_components/bootstrap-datepicker/js/locales/bootstrap-datepicker.pt-BR.js"></script>
- 			<!-- 		datepicker -->
-                                        <script>
+                                         <script>
                                         
                                             $(document)
                                             
@@ -79,6 +62,18 @@
                                                     })
 
                                         </script>
+ 
+ 
+ 
+ 
+  <!-- Date Picker -->
+  <link rel="stylesheet" href="/resources/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="/resources/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+  
+<script src="/resources/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+  <script src="/resources/bower_components/bootstrap-datepicker/js/locales/bootstrap-datepicker.pt-BR.js"></script>
+ 			<!-- 		datepicker -->
  </jsp:attribute>
 <jsp:body>
 <!-- Content Header (Page header) -->
@@ -88,7 +83,8 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
-        <li class="active"><a href="#"><fmt:message key="navegacao.cadastro" /></a></li>
+        <li class="active"><a href="#"><fmt:message key="navegacao.financeiro" /></a></li>
+        <li class="active"><a href="#"><fmt:message key="navegacao.controle" /></a></li>
         <li class="active"><a href="/despesa/cadastro"><fmt:message key="navegacao.despesa" /></a></li>
       </ol>
     </section>
@@ -124,14 +120,6 @@
 	                <form:errors path="nome" class="text-danger" />
 	                </div>
 	                
-	                <div class="form-group col-lg-12">
-		                <label><fmt:message key="produto.cadastro.carteira" /></label>
-						<form:select  path="carteira.id"  class="form-control select2" >
-						    <!-- <option selected="selected">Alabama</option> -->
-						    <form:options items="${carteiras}" itemLabel="nome"  itemValue="id" />
-						</form:select>
-	               </div>
-
 	                
 	                <div class="form-group col-lg-12">
                        <label><fmt:message key="despesa.cadastro.dataVencimento" /></label>

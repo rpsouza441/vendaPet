@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.lojapet.model.Fornecedor;
 import br.com.lojapet.persistence.repository.FornecedorRepository;
 
-
 @Service
 @Transactional
 public class FornecedorService {
@@ -27,6 +26,17 @@ public class FornecedorService {
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Transactional
+	public Fornecedor saveFornecedorWithReturn(Fornecedor fornecedor) {
+
+		try {
+			return dao.save(fornecedor);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public List<Fornecedor> getAllFornecedors() {
@@ -44,7 +54,7 @@ public class FornecedorService {
 			Optional<Fornecedor> fornecedorOptional = dao.findById(id);
 			Fornecedor fornecedor;
 			if (fornecedorOptional.isPresent()) {
-				 fornecedor = fornecedorOptional.get();
+				fornecedor = fornecedorOptional.get();
 			} else {
 				fornecedor = new Fornecedor();
 			}

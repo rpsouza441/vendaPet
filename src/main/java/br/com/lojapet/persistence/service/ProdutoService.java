@@ -11,10 +11,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-
 import br.com.lojapet.model.Fornecedor;
 import br.com.lojapet.model.Produto;
 import br.com.lojapet.persistence.repository.ProdutoRepository;
@@ -64,16 +60,13 @@ public class ProdutoService {
 		}
 
 	}
-
-	public List<Produto> saveProdutoWithReturn(List<Produto> produtos, Fornecedor fornecedor) {
+	
+	@Transactional
+	public List<Produto> saveProdutoWithReturn(List<Produto> produtos) {
 		List<Produto> produtoRetorno = new ArrayList<>();
-		List<Fornecedor> fornecedores = new ArrayList<>();
-		fornecedores.add(fornecedor);
 		for (Produto p : produtos) {
 			try {
-				p.setFornecedores(fornecedores);
-				Produto produto = dao.save(p);
-				produtoRetorno.add(produto);
+				produtoRetorno.add(dao.save(p));
 			} catch (DataAccessException e) {
 				e.printStackTrace();
 				return null;
@@ -97,7 +90,7 @@ public class ProdutoService {
 		return dao.search(keyword);
 	}
 	public List<Produto> searchSemRestrincao(String keyword) {
-		return dao.search(keyword);
+		return dao.searchSemRestrincao(keyword);
 	}
 
 	public Produto getProdutoById(UUID id) {

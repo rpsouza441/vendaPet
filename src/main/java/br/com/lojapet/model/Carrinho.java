@@ -2,6 +2,7 @@ package br.com.lojapet.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,40 +18,50 @@ public class Carrinho implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<CarrinhoItem, Integer> itens = new LinkedHashMap<CarrinhoItem, Integer>();
+	private Map<CarrinhoItem, Integer> itensCarrinho = new LinkedHashMap<CarrinhoItem, Integer>();
+	
+	private Calendar dataEmissao;
+
+	public Calendar getDataEmissao() {
+		return dataEmissao;
+	}
+
+	public void setDataEmissao(Calendar dataEmissao) {
+		this.dataEmissao = dataEmissao;
+	}
 
 	public void add(CarrinhoItem item) {
-		itens.put(item, getQuantidade(item) + 1);
+		itensCarrinho.put(item, getQuantidade(item) + 1);
 	}
 
 	public void limpaCarrinho() {
-		itens.clear();
+		itensCarrinho.clear();
 	}
 
 	// Método Novo
 	public void add(CarrinhoItem item, Integer quantidade) {
-		itens.put(item, getQuantidade(item) + quantidade);
+		itensCarrinho.put(item, getQuantidade(item) + quantidade);
 	}
 
 	public int getQuantidade(CarrinhoItem item) {
-		if (!itens.containsKey(item)) {
-			itens.put(item, 0);
+		if (!itensCarrinho.containsKey(item)) {
+			itensCarrinho.put(item, 0);
 		}
-		return itens.get(item);
+		return itensCarrinho.get(item);
 	}
 
 	public int getQuantidade() {
-		return itens.values().stream().reduce(0, (proximo, acumulador) -> (proximo + acumulador));
+		return itensCarrinho.values().stream().reduce(0, (proximo, acumulador) -> (proximo + acumulador));
 	}
 
 	public void updateQuantidade(CarrinhoItem item, int quantidade) {
 
-		itens.computeIfPresent(item, (k, v) -> v = quantidade);
+		itensCarrinho.computeIfPresent(item, (k, v) -> v = quantidade);
 
 	}
 
 	public Collection<CarrinhoItem> getItens() {
-		return itens.keySet();
+		return itensCarrinho.keySet();
 	}
 
 	public BigDecimal getTotal(CarrinhoItem item) {
@@ -59,7 +70,7 @@ public class Carrinho implements Serializable {
 
 	public BigDecimal getTotal() {
 		BigDecimal total = BigDecimal.ZERO;
-		for (CarrinhoItem item : itens.keySet()) {
+		for (CarrinhoItem item : itensCarrinho.keySet()) {
 			total = total.add(getTotal(item));
 		}
 		return total;
@@ -67,21 +78,21 @@ public class Carrinho implements Serializable {
 
 	public BigDecimal getValorTotal() {
 		BigDecimal total = BigDecimal.ZERO;
-		for (CarrinhoItem item : itens.keySet()) {
+		for (CarrinhoItem item : itensCarrinho.keySet()) {
 			total = total.add(getTotal(item));
 		}
 		return total;
 	}
 
 	public void remover(CarrinhoItem item) {
-		itens.remove(item);
+		itensCarrinho.remove(item);
 
 	}
 
 	public Map<UUID, Integer> getUuidEQuantidade() {
 		Map<UUID, Integer> listaDeUuidEQuantidade = new LinkedHashMap<UUID, Integer>();
 
-		itens.forEach((k, v) -> listaDeUuidEQuantidade.put(k.getProduto().getId(), v));
+		itensCarrinho.forEach((k, v) -> listaDeUuidEQuantidade.put(k.getProduto().getId(), v));
 		return listaDeUuidEQuantidade;
 
 	}
