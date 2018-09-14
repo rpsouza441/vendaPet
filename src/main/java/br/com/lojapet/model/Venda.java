@@ -111,8 +111,13 @@ public class Venda implements Serializable {
 			this.dataEmissao = Calendar.getInstance();
 			this.subtotal = valorTotal;
 			this.total = valorTotal;
-			contaAReceber = Arrays.asList(Pagamento.builder().total(valorTotal).dataVencimento(dataEmissao)
-					.dataPagamento(dataEmissao).contaRecebida(this).build());
+			contaAReceber = Arrays.asList(Pagamento.builder()
+					.total(valorTotal)
+					.dataEmissao(this.dataEmissao)
+					.dataVencimento(this.dataEmissao)
+					.dataPagamento(this.dataEmissao)
+					.contaRecebida(this)
+					.build());
 		}
 
 	}
@@ -125,8 +130,14 @@ public class Venda implements Serializable {
 			dataVecimentoParcelamento = (Calendar) this.dataEmissao.clone();
 			dataVecimentoParcelamento.add(Calendar.MONTH, i);
 
-			novoParcelamento.add(Pagamento.builder().total(valorParcelado).pago(BigDecimal.ZERO).aPagar(valorParcelado)
-					.dataVencimento(dataVecimentoParcelamento).estaQuitado(StatusConta.NAOQUITADO).contaRecebida(this)
+			novoParcelamento.add(Pagamento.builder()
+					.total(valorParcelado)
+					.pago(BigDecimal.ZERO)
+					.aPagar(valorParcelado)
+					.dataVencimento(dataVecimentoParcelamento)
+					.dataEmissao(this.dataEmissao)
+					.estaQuitado(StatusConta.NAOQUITADO)
+					.contaRecebida(this)
 					.build());
 
 		}
@@ -138,18 +149,32 @@ public class Venda implements Serializable {
 		this.cliente = ((clienteTemp == null) ? null : clienteTemp);
 		this.listaProduto = produtos;
 		this.user = logado;
+		if(this.subtotal== null){
+			this.subtotal=BigDecimal.ZERO;
+		}
 		this.total = this.subtotal.subtract(this.desconto);
-		sePrimeiroVencimentoIgualAEmissaoEstaPago();
+		montaPagamentos();
 
 	}
+	
+	
+	
 
-	private void sePrimeiroVencimentoIgualAEmissaoEstaPago() {
-		if (this.contaAReceber.get(0).getDataVencimento() == this.dataEmissao) {
-			this.contaAReceber.get(0).setDataPagamento(this.dataEmissao);
-			this.contaAReceber.get(0).setPago(this.contaAReceber.get(0).getTotal());
-			this.contaAReceber.get(0).setAPagar(BigDecimal.ZERO);
-			this.contaAReceber.get(0).setEstaQuitado(StatusConta.QUITADO);
-
+	private void montaPagamentos() {
+		for (Pagamento pagamento : contaAReceber) {
+			if (pagamento.getDataVencimento() == this.dataEmissao) {
+				pagamento.setDataPagamento(this.dataEmissao);
+				pagamento.setDataEmissao(this.dataEmissao);
+				pagamento.setPago(pagamento.getTotal());
+				pagamento.setAPagar(BigDecimal.ZERO);
+				pagamento.setEstaQuitado(StatusConta.QUITADO);
+			}else {
+				pagamento.setAPagar(pagamento.getTotal());
+				pagamento.setDataEmissao(this.dataEmissao);
+				pagamento.setPago(BigDecimal.ZERO);
+				pagamento.setEstaQuitado(StatusConta.NAOQUITADO);
+			}
+			
 		}
 	}
 

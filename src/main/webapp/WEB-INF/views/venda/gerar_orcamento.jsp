@@ -12,14 +12,42 @@
 <customTags:page title="${title}"  >
  <jsp:attribute name="extraScripts">
  
-  <!-- toggle -->
-  <link href="/resources/plugins/bootstrap-toggle/bootstrap-toggle.min.css" rel="stylesheet">
-  <script src="/resources/plugins/bootstrap-toggle/bootstrap-toggle.min.js"></script>
-  <script>
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/pt-br.js"></script>
+                 <link rel="stylesheet" href="https://cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/build/css/bootstrap-datetimepicker.css" />
+    <script>
   $(document).ready(function() {
 	  window.print();
 	});
+</script>       
+<script>
+
+
+$(document).ready(function() {
+	$('#input-search').autocomplete({
+		source : '${pageContext.request.contextPath }/venda/search',
+	      select: function( event, ui ) {
+	    	  var keyword = ui.item.label;
+	          console.log( "Selected: " + ui.item.value + " aka " + ui.item.id +" --- "+ keyword );
+	          $.ajax({
+	        	  type:'GET',
+	        	  url:'${pageContext.request.contextPath }/venda/searchAjax?keyword=' + keyword,
+	              success: function(result){
+	            	  var clientes = JSON.parse(result)
+	            	  $("#idCliente").val(clientes[0].id);
+	              }
+	        	  
+	          });
+	      }
+	});
+});
 </script>
+         
+         
+  <!-- toggle -->
+  <link href="/resources/plugins/bootstrap-toggle/bootstrap-toggle.min.css" rel="stylesheet">
+  <script src="/resources/plugins/bootstrap-toggle/bootstrap-toggle.min.js"></script>
 	
 <!--  TouchSPin -->
  <script src="/resources/plugins/touchspin/jquery.bootstrap-touchspin.js"></script>
@@ -39,6 +67,14 @@
    			<!-- 		datepicker -->
 <script src="/resources/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
   <script src="/resources/bower_components/bootstrap-datepicker/js/locales/bootstrap-datepicker.pt-BR.js"></script>
+
+
+
+  
+  <link rel="stylesheet" href="/resources/bower_components/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css">
+<script src="/resources/bower_components/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="/resources/bower_components/moment/src/moment.js"></script>
+               
                                         
  </jsp:attribute>
 <jsp:body>
@@ -49,7 +85,7 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
-        <li class="active"><a href="/carrinho"><fmt:message key="navegacao.venda" /></a></li>
+        <li class="active"><a href="/venda"><fmt:message key="navegacao.venda" /></a></li>
       </ol>
     </section>
 
@@ -60,9 +96,9 @@
     <div class="row">
      
         <!-- right column -->
-        <div class="col-md-8">
+        <div class="col-md-12">
           <!-- Horizontal Form -->
-          <div class="box box-primary">
+          <div class="box box-default">
             <div class="box-header with-border">
 <!--               <h3 class="box-title"> -->
 <%--               <fmt:message key="venda.cadastro.h3" /> --%>
@@ -80,99 +116,161 @@
 	               	                
 	                <div class="form-group col-lg-12">
                        <label><fmt:message key="venda.cadastro.dataEmissao" /></label>
-                       <form:input type="text" path="dataEmissao" cssClass="form-control dataPicker"  placeholder="${data} DD/MM/AAAA" />
+                       <form:input type="datetime" path="dataEmissao" id="dataPicker" cssClass="form-control dateTimePicker"
+                         placeholder="${dataEmissao} DD/MM/AAAA " />
                         <form:errors path="dataEmissao" class="text-danger" />
                      </div>
                      
+                     
+                     
 	                <div class="form-group col-lg-12">
-	                  <label ><fmt:message key="venda.cadastro.valorVenda" /></label>
-	                  <fmt:message key="venda.cadastro.valorVendaPlaceHolder" var="valorVendaPlaceHolder"/>
-	                  <form:input  path="valorVenda" cssClass="form-control money" readonly="true" placeholder="${valorVendaPlaceHolder}" />
-	                <form:errors path="valorVenda" class="text-danger" />
+	                  <label ><fmt:message key="venda.cadastro.subtotal" /></label>
+	                  <fmt:message key="venda.cadastro.subtotalPlaceHolder" var="subtotalPlaceHolder"/>
+	                  <form:input  path="subtotal" cssClass="form-control money" readonly="true" placeholder="${subtotalPlaceHolder}" />
+	                <form:errors path="subtotal" class="text-danger" />
 	                </div>
-	               
-	               
 	                <div class="form-group col-lg-12">
-	                  <label ><fmt:message key="venda.cadastro.valorDesconto" /></label>
-	                  <fmt:message key="venda.cadastro.valorDescontoPlaceHolder" var="valorDescontoPlaceHolder"/>
-	                  <form:input type="number"  path="valorDesconto"  cssClass="form-control money" style="-webkit-outer-spin-button { 
-							    -webkit-appearance: none;
-							    -moz-appearance: none;
-							    appearance: none;
-							    margin: 0; 
-							}"  placeholder="${valorDescontoPlaceHolder}" />
-	                <form:errors path="valorDesconto" class="text-danger" />
+	                  <label ><fmt:message key="venda.cadastro.desconto" /></label>
+	                  <fmt:message key="venda.cadastro.descontoPlaceHolder" var="descontoPlaceHolder"/>
+	                  <form:input  path="desconto" cssClass="form-control money"  placeholder="${descontoPlaceHolder}" />
+	                <form:errors path="desconto" class="text-danger" />
 	                </div>
-	                
-	                
-	                 <div class="form-group col-lg-12">
-	                  <label ><fmt:message key="venda.cadastro.valorFinal" /></label>
-	                  <fmt:message key="venda.cadastro.valorFinalPlaceHolder" var="valorFinalPlaceHolder"/>
-	                  <form:input  path="valorFinal" cssClass="form-control money"  placeholder="${valorFinalPlaceHolder}" />
-	                <form:errors path="valorFinal" class="text-danger" />
+	                <div class="form-group col-lg-12">
+	                  <label ><fmt:message key="venda.cadastro.total" /></label>
+	                  <fmt:message key="venda.cadastro.totalPlaceHolder" var="totalPlaceHolder"/>
+	                  <form:input  path="total" cssClass="form-control money"  placeholder="${totalPlaceHolder}" />
+	                <form:errors path="total" class="text-danger" />
 	                </div>
 	               
-<!-- 	                 <div class="form-group col-lg-12"> -->
-<%-- 		                <label><fmt:message key="venda.cadastro.carteira" /></label> --%>
-<%-- 						<form:select  path="carteira.id"  class="form-control select2" > --%>
-<!-- 						    <option selected="selected">Alabama</option> -->
-<%-- 						    <form:options items="${carteiras}" itemLabel="nome"  itemValue="id" /> --%>
-<%-- 						</form:select> --%>
-<%-- 						<form:errors path="carteira" class="text-danger" /> --%>
-						
-<!-- 	               </div> -->
 	               
-<!-- 	                 <div class="form-group col-lg-6"> -->
-<!-- 		                 <div id="console-event">    -->
-<!-- 			                  <label > -->
-<%-- 			                	 <fmt:message key="produto.cadastro.estaAtivo" /> --%>
-<!-- 			                 </label> -->
-<!-- 		                 </div> -->
-<!-- 	                  <label > -->
-	                  
-	                  
-<%-- 	                  <form:checkbox data-toggle="toggle"  --%>
-<%-- 	                 	 	 data-on="Ativo" data-off="Desativado" --%>
-<%-- 	                  		 data-onstyle="success" id="toggle-parcelamento" --%>
-<%-- 							 data-offstyle="danger" path="estaPago"   --%>
-<%-- 							 class="btn btn-default" /> --%>
-	                  
-<!-- 	               	                     </label> -->
-	               
-	                  
-<%-- 	                <form:errors class="text-danger" path="estaPago" /> --%>
+<!-- 	                <div class="form-group col-lg-12"> -->
+<%-- 	                  <label ><fmt:message key="venda.cadastro.valorDesconto" /></label> --%>
+<%-- 	                  <fmt:message key="venda.cadastro.valorDescontoPlaceHolder" var="valorDescontoPlaceHolder"/> --%>
+<%-- 	                  <form:input type="number"  path="valorDesconto"  cssClass="form-control money" style="-webkit-outer-spin-button {  --%>
+<%-- 							    -webkit-appearance: none; --%>
+<%-- 							    -moz-appearance: none; --%>
+<%-- 							    appearance: none; --%>
+<%-- 							    margin: 0;  --%>
+<%-- 							}"  placeholder="${valorDescontoPlaceHolder}" /> --%>
+<%-- 	                <form:errors path="valorDesconto" class="text-danger" /> --%>
 <!-- 	                </div> -->
-	               
-	               
-	               
-	               
-	               
-	               
-		                 <div class="form-group col-lg-12">
-		                 <div class="row">
-		                 <div class="col-lg-8">
-							<div class="col-lg-12">
-			                  <label ><fmt:message key="venda.cadastro.valorParcelado" /></label>
-			                  <fmt:message key="venda.cadastro.valorFinalPlaceHolder" var="valorFinalPlaceHolder"/>
-			                  <form:input  path="parcela" cssClass="form-control number"  placeholder="${quantidadeParcelasPlaceHolder}" />
+	                
+	                
+<!-- 	                 <div class="form-group col-lg-12"> -->
+<%-- 	                  <label ><fmt:message key="venda.cadastro.valorFinal" /></label> --%>
+<%-- 	                  <fmt:message key="venda.cadastro.valorFinalPlaceHolder" var="valorFinalPlaceHolder"/> --%>
+<%-- 	                  <form:input  path="valorFinal" cssClass="form-control money"  placeholder="${valorFinalPlaceHolder}" /> --%>
+<%-- 	                <form:errors path="valorFinal" class="text-danger" /> --%>
+<!-- 	                </div> -->
+</div>
+	                <!-- PARCELAS -->
+	                <div class="box box-deault">
+	                       <div class="col-md-12">
+	                
+			            <div class="box-header with-border">
+			            <h3 class="box-title"> 
+			            	<fmt:message key="venda.fmt.parcela" />
+			            	</h3>
+					   </div>
+			            </div>
+			            <div class="row">
+			              <div class="col-md-12">
+			              
+				            <div class=" form-group col-lg-4">
+				               <label><fmt:message key="venda.label.cliente" /></label>
+				               <fmt:message key="venda.search.placeHolder" var="placeHolder"/>
+							   <fmt:message key="procurar.produto.mensagem.erro" var="erro" />
+							   <form:input id="input-search" path="cliente.nomeCompleto" cssClass="form-control" 
+							   placeholder="${placeHolder}" data-minlength="3" 
+							  data-error="${erro }" />
+							<form:errors path="cliente" class="text-danger" />
+								
+								
+								
+									
+						<form:hidden id="idCliente" path="cliente.id" value="" />									
+			               </div>
+			               
+				            <div class=" form-group col-lg-4">
+		                         	      
+								            <label><fmt:message key="venda.label.parcelas" /></label>
+								            <form:input  path="parcelas" cssClass="form-control"  />
 							</div>
-							<div class="col-lg-12">
 							
-							<p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-							<fmt:message key="venda.cadastro.totalde" /> <label id="valorParcelamento" style=" font-weight: normal ">
-					            
-							</label>
-          					</p>
-							</div>
-							</div>
-		                 </div>
-
+				               <div class=" form-group col-lg-4 hidden-print">
+				               <label></label>
+								             <button class="btn btn-block " type="submit" name="gerarParcelasOrcamento">
+												    <i class="fa fa-gear"></i>
+												    <fmt:message key="venda.btn.gerar" />
+									    	 </button> 
+				              </div>
+			              
+						  </div>
+						</div>
+						
+				<div class="row">
+				  <div class="col-md-12">
+						
+	              <c:forEach items="${venda.contaAReceber }" var="conta" varStatus="cont">
+		                <div class="div${cont.index} replace">
+		                 <div class="form-group col-lg-4 ">
+	                       <label><fmt:message key="venda.cadastro.dataVencimento" /></label>
+	                       <form:input type="datetime" path="contaAReceber[${cont.index}].dataVencimento" 
+	                       id="dataPicker" cssClass="form-control datePicker"
+	                         placeholder="${conta.dataVencimento} DD/MM/AAAA " />
+	                        <form:errors path="contaAReceber[${cont.index}].dataVencimento" class="text-danger" />
+	                     </div>
+	                
+	                
+		                <div class="form-group col-lg-4">
+			                <label><fmt:message key="venda.fechar.formadepagamento" /></label>
+							<form:select  path="contaAReceber[${cont.index}].formaDePagamento"  class="form-control select2" >
+							     <c:forEach items="${formaDePagamento}" var="p">  
+								    <fmt:message key="formaDePagamento.${p }"  var="forma"  />
+							        <form:option value="${p}" label="${forma }"/>
+						        </c:forEach>
+							</form:select>
+		               </div>
+		               
+		              <div class="form-group col-lg-4"> 
+		                  <label ><fmt:message key="venda.cadastro.valorTotalParcela" /></label>
+		                  <fmt:message key="venda.cadastro.totalPlaceHolder" var="totalPlaceHolder"/>
+		                  <form:input path="contaAReceber[${cont.index}].total" cssClass="form-control money totalParcelado" readonly="true" placeholder="${totalPlaceHolder}" />
+		                  <form:errors path="contaAReceber[${cont.index}].total" class="text-danger" />
+	                </div> 
+		               
 		                </div>
+	                
+	              </c:forEach>
+	          </div> 
+	          </div>    
+	               
+	               
+<!-- 		                 <div class="form-group col-lg-12"> -->
+<!-- 		                 <div class="row"> -->
+<!-- 		                 <div class="col-lg-8"> -->
+<!-- 							<div class="col-lg-12"> -->
+<%-- 			                  <label ><fmt:message key="venda.cadastro.valorParcelado" /></label> --%>
+<%-- 			                  <fmt:message key="venda.cadastro.valorFinalPlaceHolder" var="valorFinalPlaceHolder"/> --%>
+<%-- 			                  <form:input  path="parcela" cssClass="form-control number"  placeholder="${quantidadeParcelasPlaceHolder}" /> --%>
+<!-- 							</div> -->
+<!-- 							<div class="col-lg-12"> -->
+							
+<!-- 							<p class="text-muted well well-sm no-shadow" style="margin-top: 10px;"> -->
+<%-- 							<fmt:message key="venda.cadastro.totalde" /><label id="valorParcelamento" style=" font-weight: normal "> --%>
+					            
+<!-- 							</label> -->
+<!--           					</p> -->
+<!-- 							</div> -->
+<!-- 							</div> -->
+<!-- 		                 </div> -->
+
+<!-- 		                </div> -->
                      
 						
 	              </div>
 	              <!-- /.box-body -->
-              <div class="box-footer hidden-print">
+               <div class="box-footer hidden-print">
 <!--                 <button type="submit" class="btn btn-default">Cancel</button> -->
                 	<a  rel="tooltip" class="btn btn-info pull-right btn-lg btn-block"
 							 id="edit_event"   onclick="window.print()">
@@ -180,7 +278,7 @@
 							 <i	class="fa  fa-print"></i> 
 						</a>
 						<a  rel="tooltip" class="btn btn-info pull-right btn-lg btn-block"
-							 id="edit_event"   href="<s:url value='/carrinho/limparCarrinho' />">
+							 id="edit_event"   href="<s:url value='/venda/limparCarrinho' />">
 						<fmt:message key="carrinho.zerar" />
 							 <i	class="fa  fa-trash-o"></i> 
 						</a>

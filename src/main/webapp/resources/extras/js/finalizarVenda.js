@@ -94,6 +94,11 @@ $("input[name='parcela']").TouchSpin({
 	max : 12,
 
 });
+$(".touchspin").TouchSpin({
+	initval : 1,
+	min : 1,
+	
+});
 
 $(function() {
 	$('.money').maskMoney({

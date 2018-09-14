@@ -22,6 +22,8 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.google.gson.annotations.Expose;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -81,7 +83,6 @@ public class Cliente {
 	private String observacoes;
 	
 	private boolean clienteSemNome = Boolean.FALSE;
-
 
 	@OneToMany
 	@JoinColumn(name = "cliente_venda_id", foreignKey = @ForeignKey(name = "cliente_venda_fk"))

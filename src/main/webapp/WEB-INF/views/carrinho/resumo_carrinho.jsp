@@ -56,7 +56,7 @@ console.log(max_chars);
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
         <li class="active"><a href=""><fmt:message key="navegacao.atendimento" /></a></li>
-        <li class="active"><a href="/carrinho"><fmt:message key="navegacao.venda" /></a></li>
+        <li class="active"><a href="/venda"><fmt:message key="navegacao.venda" /></a></li>
       </ol>
     </section>
 
@@ -111,7 +111,7 @@ console.log(max_chars);
 					<td >${carrinho.getTotal(item)}</td>
 					<td >
 							<a  rel="tooltip" class="btn btn-danger"
-							 id="edit_event"   href="<s:url value='/carrinho/removerDoCarrinho/${item.produto.id}' />">
+							 id="edit_event"   href="<s:url value='/venda/removerDoCarrinho/${item.produto.id}' />">
 							 <i	class="fa  fa-trash-o"></i> 
 						</a>
 					</td>
@@ -190,13 +190,13 @@ console.log(max_chars);
              <div class="col-xs-12">
 			 			
 			 			<a  rel="tooltip" class="btn btn-default btn-lg pull-left"
-							 id="edit_event"   href="<s:url value='produto/procurarProduto' />">
+							 id="edit_event"   href="<s:url value='/venda/procurarProduto' />">
 							 <i	class="fa fa-angle-left"></i> 
 				    	<fmt:message key="carrinho.adicionarProduto" />
 
 						</a>
 						<a  rel="tooltip" class="btn btn-default btn-lg pull-right "
-							 id="edit_event"   href="<s:url value='/carrinho/limparCarrinho/' />">
+							 id="edit_event"   href="<s:url value='/venda/limparCarrinho/' />">
 						<fmt:message key="carrinho.zerar" />
 							 <i	class="fa  fa-trash-o"></i> 
 						</a>

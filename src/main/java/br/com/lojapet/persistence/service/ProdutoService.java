@@ -11,7 +11,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.lojapet.model.Fornecedor;
 import br.com.lojapet.model.Produto;
 import br.com.lojapet.persistence.repository.ProdutoRepository;
 
@@ -38,6 +37,21 @@ public class ProdutoService {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public void novaCompra(List<Produto> list) {
+		for (Produto p : list) {
+			Produto produtoById = getProdutoById(p.getId());
+			System.out.println("quantidade antes de ser alterada"+produtoById.getQuantidade());
+			produtoById.adicionaQuantidadeAlteravalor(p.getQuantidade(), p.getValorCusto());
+			System.out.println("quantidade a adicionar"+p.getQuantidade());
+			
+			System.out.println("quantidade alteradada"+produtoById.getQuantidade());
+			
+			updateProduto(produtoById);
+		}
+		
+	}
 
 	@Transactional
 	public void removeQuantidade(UUID id, Integer quantidade) {
@@ -60,7 +74,7 @@ public class ProdutoService {
 		}
 
 	}
-	
+
 	@Transactional
 	public List<Produto> saveProdutoWithReturn(List<Produto> produtos) {
 		List<Produto> produtoRetorno = new ArrayList<>();
@@ -89,8 +103,27 @@ public class ProdutoService {
 	public List<Produto> search(String keyword) {
 		return dao.search(keyword);
 	}
+
 	public List<Produto> searchSemRestrincao(String keyword) {
 		return dao.searchSemRestrincao(keyword);
+	}
+
+	public Produto getProdutoByNome(String nome) {
+		try {
+
+			Optional<Produto> produtoOptional = dao.findByNome(nome);
+			Produto produto;
+			if (produtoOptional.isPresent()) {
+				produto = produtoOptional.get();
+			} else {
+				produto = new Produto();
+			}
+			return produto;
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 
 	public Produto getProdutoById(UUID id) {
@@ -120,12 +153,22 @@ public class ProdutoService {
 	}
 
 	@Transactional
-	public void updateProduto(Produto produto) {
+	public Produto updateProduto(Produto produto) {
 		try {
-			dao.save(produto);
+			return dao.save(produto);
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
+
+	public boolean produtoExisteCom(String nome) {
+		if (nome != null && nome != "") {
+			return dao.existsByNome(nome);
+		}
+		return false;
+	}
+
+	
 
 }

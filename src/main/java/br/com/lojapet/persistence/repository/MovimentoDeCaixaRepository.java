@@ -4,10 +4,8 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.com.lojapet.model.Carteira;
+import br.com.lojapet.model.MovimentoDeCaixa;
 
-public interface CarteiraRepository  extends JpaRepository<Carteira, UUID> {
-	
-	
+public interface MovimentoDeCaixaRepository extends JpaRepository<MovimentoDeCaixa, UUID> {
 
 }

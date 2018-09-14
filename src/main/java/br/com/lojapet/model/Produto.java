@@ -100,11 +100,15 @@ public class Produto {
 	    return this.getValorVenda().multiply(new BigDecimal(quantidade));
 	}
 
-	public void removeQuantidade(int quantidadeASerRemovida) {
+	public void removeQuantidade(long quantidadeASerRemovida) {
 		this.quantidade= this.quantidade-quantidadeASerRemovida;
 	}
-	public void adicionaQuantidade(int quantidadeASerRemovida) {
-		this.quantidade= this.quantidade+quantidadeASerRemovida;
+	public void adicionaQuantidade(long quantidadeASerAdicionada) {
+		this.quantidade= this.quantidade+quantidadeASerAdicionada;
+	}
+	public void adicionaQuantidadeAlteravalor(long quantidadeASerAdicionada, BigDecimal novoValorCusto) {
+		this.quantidade= this.quantidade+quantidadeASerAdicionada;
+		this.valorCusto=novoValorCusto;
 	}
 
 	public void addFornecedor(Fornecedor fornecedorPersistido) {

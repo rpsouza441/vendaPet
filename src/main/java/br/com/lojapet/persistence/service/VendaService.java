@@ -1,5 +1,6 @@
 package br.com.lojapet.persistence.service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -81,6 +82,10 @@ public class VendaService {
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public List<Venda> findVendaBetweenOrderByEmissao(Calendar start, Calendar end){
+		return dao.findByDataEmissaoBetweenOrderByDataEmissaoAsc(start, end);
 	}
 
 }

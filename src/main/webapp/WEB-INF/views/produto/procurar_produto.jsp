@@ -30,7 +30,7 @@
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
         <li><a href="/"><fmt:message key="navegacao.atendimento" /></a></li>
-        <li class="active"><a href="/produto/procurarProduto"><fmt:message key="navegacao.venda" /></a></li>
+        <li class="active"><a href="/venda/procurarProduto"><fmt:message key="navegacao.venda" /></a></li>
       </ol>
     </section>
 
@@ -57,7 +57,7 @@
             
              <div class="table-responsive">
              
-    <form:form action="${s:mvcUrl('PC#search').build() }" id="form_search"  method="post"
+    <form:form action="${s:mvcUrl('CC#procurarProduto').build() }" id="form_search"  method="post"
 					modelAttribute="search" autocomplete="off"
 					data-toggle="validator">
 				    <div class="col-xs-6">
@@ -135,7 +135,7 @@
                   <td width="20%">${p.valorVenda }  </td>
                   <td width="15%">${p.quantidade }  </td>
                   <td class="td-actions text-middle" width="5%">
-						<a  rel="tooltip" class="btn btn-success" id="edit_event"   href="<s:url value='/carrinho/adicionaNoCarrinho/${p.id}' />">
+						<a  rel="tooltip" class="btn btn-success" id="edit_event"   href="<s:url value='/venda/adicionaNoCarrinho/${p.id}' />">
 							 <i	class="fa   fa-cart-plus"></i> 
 						</a>
 					</td>

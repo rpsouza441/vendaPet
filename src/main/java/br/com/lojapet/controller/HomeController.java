@@ -7,10 +7,10 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class HomeController {
 
+	
 	@RequestMapping(value = "/")
 	public ModelAndView home(ModelAndView modelAndView) {
 		modelAndView = new ModelAndView("index");
-		
 		
 		return modelAndView;
 	}

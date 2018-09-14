@@ -20,16 +20,17 @@
 <script>
 $(document).ready(function() {
 	$('#input-search').autocomplete({
-		source : '${pageContext.request.contextPath }/carrinho/search',
+		source : '${pageContext.request.contextPath }/venda/search',
 	      select: function( event, ui ) {
 	    	  var keyword = ui.item.label;
 	          console.log( "Selected: " + ui.item.value + " aka " + ui.item.id +" --- "+ keyword );
 	          $.ajax({
 	        	  type:'GET',
-	        	  url:'${pageContext.request.contextPath }/carrinho/searchAjax?keyword=' + keyword,
+	        	  url:'${pageContext.request.contextPath }/venda/searchAjax?keyword=' + keyword,
 	              success: function(result){
 	            	  var clientes = JSON.parse(result)
-	            	  $("#idCliente").val(clientes[0].id);
+	            	  console.log(clientes.id);
+	            	  $("#idCliente").val(clientes.id);
 	              }
 	        	  
 	          });
@@ -79,7 +80,7 @@ $(document).ready(function() {
       </h1>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
-        <li class="active"><a href="/carrinho"><fmt:message key="navegacao.venda" /></a></li>
+        <li class="active"><a href="/venda"><fmt:message key="navegacao.venda" /></a></li>
       </ol>
     </section>
 
@@ -195,7 +196,7 @@ $(document).ready(function() {
 				               <label></label>
 								             <button class="btn btn-block " type="submit" name="gerarParcelas">
 												    <i class="fa fa-gear"></i>
-												    <fmt:message key="venda.btn.gerar" />
+												    <fmt:message key="btn.gerar" />
 									    	 </button> 
 				              </div>
 			              

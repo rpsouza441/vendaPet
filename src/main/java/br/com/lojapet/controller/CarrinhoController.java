@@ -18,9 +18,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.Gson;
 
@@ -42,10 +44,9 @@ import br.com.lojapet.persistence.service.MovimentoDeCaixaService;
 import br.com.lojapet.persistence.service.ProdutoService;
 import br.com.lojapet.persistence.service.UserService;
 import br.com.lojapet.persistence.service.VendaService;
-import net.bytebuddy.implementation.bytecode.collection.ArrayAccess;
 
 @Controller
-@RequestMapping(value = "/carrinho")
+@RequestMapping(value = "/venda")
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CarrinhoController {
 
@@ -72,7 +73,7 @@ public class CarrinhoController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView home(ModelAndView modelAndView) {
-		modelAndView = redirecionaSeCarrinhoEstaVazio("/carrinho/resumo_carrinho", "redirect:/produto/procurarProduto");
+		modelAndView = redirecionaSeCarrinhoEstaVazio("/carrinho/resumo_carrinho", "redirect:/venda/procurarProduto");
 
 		return modelAndView;
 	}
@@ -82,7 +83,7 @@ public class CarrinhoController {
 
 		CarrinhoItem item = createItem(uuid);
 		carrinho.add(item);
-		return new ModelAndView("redirect:/carrinho");
+		return new ModelAndView("redirect:/venda");
 
 	}
 
@@ -92,7 +93,7 @@ public class CarrinhoController {
 		System.out.println(produtoId);
 		carrinho.remover(createItem(produtoId));
 		// carrinho.remover(produtoId, tipoPreco);
-		return new ModelAndView("redirect:/carrinho");
+		return new ModelAndView("redirect:/venda");
 	}
 
 	@RequestMapping(value = "/finalizar", method = RequestMethod.POST)
@@ -111,30 +112,30 @@ public class CarrinhoController {
 				carrinho.updateQuantidade(it.next(), Integer.parseInt(quantidades[i]));
 				i++;
 			}
-			return new ModelAndView("redirect:/carrinho");
+			return new ModelAndView("redirect:/venda");
 
 		} else if (request.getParameter("orcamento") != null) {
-			return new ModelAndView("redirect:/carrinho/gerarOrcamento");
+			return new ModelAndView("redirect:/venda/gerarOrcamento");
 			/*
 			 * To-Do esta quebrado
 			 */
 		}
 
-		return new ModelAndView("redirect:/carrinho/fecharVenda");
+		return new ModelAndView("redirect:/venda/fecharVenda");
 
 	}
 
 	@RequestMapping(value = "/limparCarrinho", method = RequestMethod.GET)
 	public ModelAndView limparCarrinho() {
 		carrinho.limpaCarrinho();
-		return new ModelAndView("redirect:/carrinho");
+		return new ModelAndView("redirect:/venda");
 
 	}
 
 	@RequestMapping(value = "fecharVenda")
 	public ModelAndView fecharVenda(Venda venda) {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
-				"redirect:/produto/procurarProduto");
+				"redirect:/venda/procurarProduto");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
 		venda.montaVenda(carrinho.getValorTotal());
@@ -148,7 +149,7 @@ public class CarrinhoController {
 	@RequestMapping(value = "fecharVenda", method = RequestMethod.POST)
 	public ModelAndView atualizaFecharVenda(Venda venda) {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
-				"redirect:/produto/procurarProduto");
+				"redirect:/venda/procurarProduto");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
 		venda.montaVenda(carrinho.getValorTotal());
@@ -161,7 +162,7 @@ public class CarrinhoController {
 	@RequestMapping(value = "finalizarVenda")
 	public ModelAndView finalizarVenda(Venda venda, BindingResult result, HttpServletRequest request) {
 
-		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("redirect:/", "redirect:/produto/procurarProduto");
+		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("redirect:/", "redirect:/venda/procurarProduto");
 		if (carrinho.getItens().isEmpty()) {
 			return modelAndView;
 		}
@@ -169,6 +170,11 @@ public class CarrinhoController {
 			venda.gerarParcelas();
 			return atualizaFecharVenda(venda);
 
+		}
+		if (request.getParameter("gerarParcelasOrcamento") != null) {
+			venda.gerarParcelas();
+			return gerarOrcamento(venda);
+			
 		}
 
 		verificaSeClientePossuIDESeExiste(venda, result);
@@ -203,19 +209,39 @@ public class CarrinhoController {
 	@ResponseBody
 	public String searchAjax(HttpServletRequest request) {
 		Gson gson = new Gson();
-
-		return gson.toJson(clienteService.getListClienteByNameLike(request.getParameter("keyword")));
+		Cliente cliente = clienteService.getListClienteByName(request.getParameter("keyword"));
+		cliente.setVendas(null);
+		return gson.toJson(cliente);
 	}
 
 	@RequestMapping(value = "gerarOrcamento")
 	public ModelAndView gerarOrcamento(Venda venda) {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/gerar_orcamento",
-				"redirect:/produto/procurarProduto");
+				"redirect:/venda/procurarProduto");
+		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
+		venda.montaVenda(carrinho.getValorTotal());
+		venda.setParcelas(1);
 		// montaVendaParaPaginaDeFinalizarVenda(venda);
 		modelAndView.addObject("venda", venda);
 
 		return modelAndView;
+	}
+	
+	
+	@RequestMapping(value = "/procurarProduto")
+	public ModelAndView procurarProduto(@RequestParam(value = "search", required = false) String q,
+			RedirectAttributes redirectAttributes) {
+		ModelAndView modelAndView = new ModelAndView("/produto/procurar_produto");
+		List<Produto> produtos = produtoService.search(q);
+		String error = null;
+		if (produtos.isEmpty() && q != null) {
+			error = "error.empty";
+		}
+		modelAndView.addObject("error", error);
+		modelAndView.addObject("produtos", produtos);
+		return modelAndView;
+
 	}
 
 	private void persisteVenda(Venda vendaASerPersistida) {

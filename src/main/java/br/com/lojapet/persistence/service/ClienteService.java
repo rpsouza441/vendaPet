@@ -81,9 +81,8 @@ public class ClienteService {
 	public List<String> getClienteByNameLike(String clienteNome) {
 		return dao.autocomplete(clienteNome);
 	}
-	public List<Cliente> getListClienteByNameLike(String parameter) {
-		// TODO Auto-generated method stub
-		return dao.findByNomeCompletoIgnoreCaseContaining(parameter);
+	public Cliente getListClienteByName(String parameter) {
+		return dao.findByNomeCompleto(parameter);
 	}
 	public boolean existsById(UUID id) {
 		if(id!=null) {

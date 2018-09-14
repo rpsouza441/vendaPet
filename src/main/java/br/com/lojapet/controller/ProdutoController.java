@@ -116,20 +116,7 @@ public class ProdutoController {
 
 	}
 
-	@RequestMapping(value = "/procurarProduto")
-	public ModelAndView search(@RequestParam(value = "search", required = false) String q,
-			RedirectAttributes redirectAttributes) {
-		ModelAndView modelAndView = new ModelAndView("/produto/procurar_produto");
-		List<Produto> produtos = produtoService.search(q);
-		String error = null;
-		if (produtos.isEmpty() && q != null) {
-			error = "error.empty";
-		}
-		modelAndView.addObject("error", error);
-		modelAndView.addObject("produtos", produtos);
-		return modelAndView;
-
-	}
+	
 
 	private List<Grupo> carregaGrupo() {
 		grupos = new ArrayList<Grupo>();

@@ -47,6 +47,25 @@ public class FornecedorService {
 		}
 		return null;
 	}
+	
+	
+	public Fornecedor getFornecedorByNome(String nome) {
+		try {
+
+			Optional<Fornecedor> fornecedorOptional = dao.findByNome(nome);
+			Fornecedor fornecedor;
+			if (fornecedorOptional.isPresent()) {
+				fornecedor = fornecedorOptional.get();
+			} else {
+				fornecedor = new Fornecedor();
+			}
+			return fornecedor;
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
 
 	public Fornecedor getFornecedorById(UUID id) {
 		try {
@@ -87,5 +106,14 @@ public class FornecedorService {
 		return dao.search(q);
 
 	}
+
+	public boolean fornecedorExisteCom(String nome) {
+		if (nome != null && nome != "") {
+			return dao.existsByNome(nome);
+		}
+		return false;
+	}
+
+	
 
 }

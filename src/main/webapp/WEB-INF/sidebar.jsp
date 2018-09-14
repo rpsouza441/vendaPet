@@ -12,6 +12,9 @@
 <%@attribute name="cadastroVenda" required="false" %>
 <%@attribute name="cadastroContaReceber" required="false" %>
 
+<%@attribute name="financeiroContaPaga" required="false" %>
+<%@attribute name="financeiroContaRecebida" required="false" %>
+<%@attribute name="fluxoCaixa" required="false" %>
 
 <%@attribute name="atendimentoCarrinho" required="false" %>
 
@@ -20,6 +23,7 @@
 <%@attribute name="listaProduto" required="false" %>
 <%@attribute name="listaVenda" required="false" %>
 <%@attribute name="listaCaixa" required="false" %>
+<%@attribute name="listaCompra" required="false" %>
 
 
 
@@ -64,7 +68,7 @@
               </a>
               <ul class="treeview-menu" style="display: block;">
                 <li class="${atendimentoCarrinho}">
-	          <a href="/carrinho">
+	          <a href="/venda">
 	            <i class="fa fa-fw fa-shopping-cart"></i> <span>
 	            <fmt:message key="navegacao.venda" /></span>
 	          </a>
@@ -112,6 +116,7 @@
         ${cadastroFornecedor}
         ${cadastroProduto }
         ${cadastroGrupo }
+        ${listaCompra}
         ">
           <a href="#">
             <i class="fa fa-fw fa-cubes"></i> <span><fmt:message key="navegacao.estoque" /></span>
@@ -142,12 +147,12 @@
 	                </a>
                 </li>
                 
-                <li>
-                	<a href="#">
-		                <i class="fa fa-fw fa-check"></i>
-		                <fmt:message key="navegacao.auditoria" />
-	                </a>
-                </li>
+<!--                 <li> -->
+<!--                 	<a href="#"> -->
+<!-- 		                <i class="fa fa-fw fa-check"></i> -->
+<%-- 		                <fmt:message key="navegacao.auditoria" /> --%>
+<!-- 	                </a> -->
+<!--                 </li> -->
                 
                 
               </ul>
@@ -167,6 +172,12 @@
 			          <a href="/fornecedor">
 			            <i class="fa fa-fw fa-user-circle"></i> <span>
 			            <fmt:message key="navegacao.fornecedor" /></span>
+			          </a>
+	          </li>
+               <li class=" ${listaCompra}">
+			          <a href="/compra">
+			            <i class="fa fa-fw fa-shopping-bag"></i> <span>
+			            <fmt:message key="navegacao.compras" /></span>
 			          </a>
 	          </li>
 	          
@@ -198,6 +209,9 @@
         ${listaCaixa }
         ${cadastroDespesa}
         ${cadastroContaReceber}
+        ${financeiroContaPaga }
+        ${financeiroContaRecebida }
+        ${fluxoCaixa }
         ">
 
           <a href="#">
@@ -220,20 +234,20 @@
               	<h4><fmt:message key="navegacao.controle" /></h4>
               </a>
               <ul class="treeview-menu" style="display: block;">
-                <li class="${cadastroContaReceber}">
-	          <a href="/contaAReceber">
+                <li class="${financeiroContaRecebida}">
+	          <a href="/conta/recebida">
 	            <i class="fa fa-fw fa-sign-in"></i> <span>
 	            <fmt:message key="navegacao.contaAReceber" /></span>
 	          </a>
 	        </li>
-	        <li class="${cadastroDespesa}">
-	          <a href="/despesa/">
+	        <li class="${financeiroContaPaga}">
+	          <a href="/conta/paga">
 	            <i class="fa fa-fw fa-sign-out"></i> <span>
 	            <fmt:message key="navegacao.contaAPagar" /></span>
 	          </a>
 	        </li>
-	        <li class="">
-	          <a href="/produto/orcamento">
+	        <li class="${fluxoCaixa}">
+	          <a href="/sistema/fluxoCaixa">
 	            <i class="fa fa-fw fa-bar-chart"></i> <span>
 	            <fmt:message key="navegacao.fluxoCaixa" /></span>
 	          </a>
@@ -296,7 +310,7 @@
 	       </li>
 	          
            <li class="${cadastroFornecedor}">
-			   <a href="/fornecedor/cadastro">
+			   <a href="/relatorio/conta/pagas">
 			        <i class="fa fa-fw fa-sign-out"></i> <span>
 			        <fmt:message key="navegacao.relatorio.contaQuitadas" /></span>
 			   </a>
@@ -310,28 +324,6 @@
         
   <li><a href="/logout"><i class=" fa fa-fw fa-power-off "></i> <span><fmt:message key="navegacao.logout" /></span></a></li>
 <!--         arvore de cadastro -->
-        <li class="treeview  
-          ${cadastroUser} ${cadastroDespesaAPagar}  
-         ${cadastroVenda}">
-          <a href="#">
-            <i class="fa fa-plus-square"></i> <span><fmt:message key="navegacao.cadastro" /></span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-           <li class="${cadastroDespesaAPagar}">
-	          <a href="/despesa/cadastro">
-	            <i class="fa   fa-circle-o"></i> <span><fmt:message key="navegacao.despesa" /></span>
-	          </a>
-	        </li>
-	        <li class="${cadastroUser}">
-	          <a href="/usuario/cadastro">
-	            <i class="fa   fa-circle-o"></i> <span><fmt:message key="navegacao.user" /></span>
-	          </a>
-	        </li>
-          </ul>
-        </li>
         
         
         
