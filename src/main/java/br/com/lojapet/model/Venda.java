@@ -111,13 +111,8 @@ public class Venda implements Serializable {
 			this.dataEmissao = Calendar.getInstance();
 			this.subtotal = valorTotal;
 			this.total = valorTotal;
-			contaAReceber = Arrays.asList(Pagamento.builder()
-					.total(valorTotal)
-					.dataEmissao(this.dataEmissao)
-					.dataVencimento(this.dataEmissao)
-					.dataPagamento(this.dataEmissao)
-					.contaRecebida(this)
-					.build());
+			contaAReceber = Arrays.asList(Pagamento.builder().total(valorTotal).dataEmissao(this.dataEmissao)
+					.dataVencimento(this.dataEmissao).dataPagamento(this.dataEmissao).contaRecebida(this).build());
 		}
 
 	}
@@ -130,15 +125,9 @@ public class Venda implements Serializable {
 			dataVecimentoParcelamento = (Calendar) this.dataEmissao.clone();
 			dataVecimentoParcelamento.add(Calendar.MONTH, i);
 
-			novoParcelamento.add(Pagamento.builder()
-					.total(valorParcelado)
-					.pago(BigDecimal.ZERO)
-					.aPagar(valorParcelado)
-					.dataVencimento(dataVecimentoParcelamento)
-					.dataEmissao(this.dataEmissao)
-					.estaQuitado(StatusConta.NAOQUITADO)
-					.contaRecebida(this)
-					.build());
+			novoParcelamento.add(Pagamento.builder().total(valorParcelado).pago(BigDecimal.ZERO).aPagar(valorParcelado)
+					.dataVencimento(dataVecimentoParcelamento).dataEmissao(this.dataEmissao)
+					.estaQuitado(StatusConta.NAOQUITADO).contaRecebida(this).build());
 
 		}
 		this.contaAReceber = novoParcelamento;
@@ -149,33 +138,58 @@ public class Venda implements Serializable {
 		this.cliente = ((clienteTemp == null) ? null : clienteTemp);
 		this.listaProduto = produtos;
 		this.user = logado;
-		if(this.subtotal== null){
-			this.subtotal=BigDecimal.ZERO;
+		if (this.subtotal == null) {
+			this.subtotal = BigDecimal.ZERO;
 		}
 		this.total = this.subtotal.subtract(this.desconto);
 		montaPagamentos();
 
 	}
-	
-	
-	
 
 	private void montaPagamentos() {
 		for (Pagamento pagamento : contaAReceber) {
-			if (pagamento.getDataVencimento() == this.dataEmissao) {
+			if (vencimentoMaiorQueEmissao(pagamento.getDataVencimento(), this.dataEmissao)) {
 				pagamento.setDataPagamento(this.dataEmissao);
 				pagamento.setDataEmissao(this.dataEmissao);
 				pagamento.setPago(pagamento.getTotal());
 				pagamento.setAPagar(BigDecimal.ZERO);
 				pagamento.setEstaQuitado(StatusConta.QUITADO);
-			}else {
+				pagamento.setObservacao(descricaoProdutos());
+				pagamento.pagamentoUmaVez();
+
+			} else {
 				pagamento.setAPagar(pagamento.getTotal());
 				pagamento.setDataEmissao(this.dataEmissao);
 				pagamento.setPago(BigDecimal.ZERO);
 				pagamento.setEstaQuitado(StatusConta.NAOQUITADO);
+				pagamento.setObservacao(descricaoProdutos());
+
 			}
-			
+
 		}
+	}
+
+	private boolean vencimentoMaiorQueEmissao(Calendar vencimento, Calendar emissao) {
+		Calendar vencimentoClone = (Calendar) vencimento.clone();
+		Calendar emissaoClone = (Calendar) emissao.clone();
+		vencimentoClone.set(Calendar.HOUR_OF_DAY, 0);
+		vencimentoClone.set(Calendar.MINUTE, 0);
+		vencimentoClone.set(Calendar.SECOND, 0);
+		vencimentoClone.set(Calendar.MILLISECOND, 0);
+		emissaoClone.set(Calendar.HOUR_OF_DAY, 0);
+		emissaoClone.set(Calendar.MINUTE, 0);
+		emissaoClone.set(Calendar.SECOND, 0);
+		emissaoClone.set(Calendar.MILLISECOND, 0);
+
+		return vencimentoClone.equals(emissaoClone);
+	}
+
+	private String descricaoProdutos() {
+		String descricao = "";
+		for (Produto p : listaProduto) {
+			descricao = p.getQuantidade() + " x " + p.getNome();
+		}
+		return descricao;
 	}
 
 }

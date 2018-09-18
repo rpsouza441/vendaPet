@@ -22,7 +22,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.com.lojapet.facade.CompraFacade;
 import br.com.lojapet.facade.XmlFacade;
-import br.com.lojapet.infra.DataFormHelper;
 import br.com.lojapet.infra.XMLExtractor;
 import br.com.lojapet.model.Compra;
 import br.com.lojapet.model.CompraForm;
@@ -59,7 +58,6 @@ public class CompraRealizadaController {
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView home(ModelAndView modelAndView) {
 		modelAndView = new ModelAndView("/compra-realizada/lista_compra");
-		DataFormHelper dataFormHelper = new DataFormHelper();
 		return modelAndView;
 	}
 
@@ -74,8 +72,6 @@ public class CompraRealizadaController {
 			RedirectAttributes redirectAttributes) {
 
 		ModelAndView modelAndView = new ModelAndView("/compra-realizada/lista_compra");
-		System.out.println(endWith);
-		System.out.println(startWith);
 		List<Compra> compras;
 		String error = null;
 
@@ -139,8 +135,6 @@ public class CompraRealizadaController {
 	public ModelAndView form(Compra compraAPagar) {
 		ModelAndView modelAndView = new ModelAndView("/compra-realizada/inserir_xml");
 		fornecedores = fornecedorService.getAllFornecedors();
-		modelAndView.addObject("compraAPagar", compraAPagar);
-		modelAndView.addObject("fornecedores", fornecedores);
 
 		return modelAndView;
 	}
@@ -149,19 +143,7 @@ public class CompraRealizadaController {
 	public ModelAndView gravarCompra(MultipartFile endereco, @Valid Compra compra, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
-		// if (compra.getFornecedor()!=null) {
-		// result.rejectValue("fornecedor", "field.required");
-		// }
-		// if (endereco.isEmpty()) {
-		// result.rejectValue("enderecoPath", "field.required");
-		// }
-		// if (result.hasErrors()) {
-		// System.out.println("Erros: "+result.getAllErrors());
-		// return form(compra);
-		// }
 		XmlFacade xmlFacade = xmlExtractor.read(endereco);
-
-		// compraService.saveCompra(compra, compra.getFornecedor().getId(), produtos);
 
 		Fornecedor fornecedorPersistido = fornecedorService.saveFornecedorWithReturn(xmlFacade.getFornecedor());
 
@@ -177,19 +159,12 @@ public class CompraRealizadaController {
 		compraXML.setFornecedor(fornecedorPersistido);
 		compraXML.setUser(retornaUsuarioLogado());
 
-		Compra compraPersistida = compraService.saveCompraWithReturn(compraXML);
+		compraService.saveCompraWithReturn(compraXML);
 
 		return new ModelAndView("redirect:/compra/cadastro");
 
 	}
 
-	@RequestMapping(value = "/editarCompra/{uuid}")
-	public ModelAndView editar(@PathVariable(value = "uuid") UUID uuid) {
-		Compra compra = compraService.getCompraById(uuid);
-
-		return form(compra);
-
-	}
 	@RequestMapping(value = "/visualizarCompra/{uuid}")
 	public ModelAndView visualizarCompra(@PathVariable(value = "uuid") UUID uuid) {
 		Compra compra = compraService.getCompraById(uuid);

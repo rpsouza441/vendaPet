@@ -89,8 +89,6 @@ public class CarrinhoController {
 
 	@RequestMapping("/removerDoCarrinho/{id}")
 	public ModelAndView remover(@PathVariable("id") UUID produtoId) {
-		System.out.println("removido");
-		System.out.println(produtoId);
 		carrinho.remover(createItem(produtoId));
 		// carrinho.remover(produtoId, tipoPreco);
 		return new ModelAndView("redirect:/venda");
@@ -116,9 +114,6 @@ public class CarrinhoController {
 
 		} else if (request.getParameter("orcamento") != null) {
 			return new ModelAndView("redirect:/venda/gerarOrcamento");
-			/*
-			 * To-Do esta quebrado
-			 */
 		}
 
 		return new ModelAndView("redirect:/venda/fecharVenda");
@@ -137,7 +132,7 @@ public class CarrinhoController {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
 				"redirect:/venda/procurarProduto");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
-
+System.out.println("get");
 		venda.montaVenda(carrinho.getValorTotal());
 		venda.setParcelas(1);
 
@@ -150,6 +145,7 @@ public class CarrinhoController {
 	public ModelAndView atualizaFecharVenda(Venda venda) {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
 				"redirect:/venda/procurarProduto");
+		System.out.println("post");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
 		venda.montaVenda(carrinho.getValorTotal());
@@ -268,7 +264,6 @@ public class CarrinhoController {
 		resolveLigacoesCaixaMovimento(caixaAberto, vendaPersistida);
 		logado.addVenda(vendaPersistida);
 		
-		System.out.println(vendaPersistida.getCliente());
 		if(vendaPersistida.getCliente()!=null) {
 			cliente.addVenda(vendaPersistida);
 			clienteService.updateCliente(cliente);
@@ -289,12 +284,10 @@ public class CarrinhoController {
 	private List<MovimentoDeCaixa> geraMovimentoDeCaixaDeVenda(Venda v, Caixa caixaAberto) {
 		List<MovimentoDeCaixa> listaMovimento = new ArrayList<MovimentoDeCaixa>();
 		for (Pagamento p : v.getContaAReceber()) {
-			System.out.println(p.getTotal());
 			listaMovimento.add(MovimentoDeCaixa.builder()
 					.dataHoraMovimento(v.getDataEmissao())
 					.valor(p.getTotal())
 					.observacao(v.getDadosCliente())
-					.formaDePagamento(p.getFormaDePagamento())
 					.origemMovimento(OrigemMovimento.VENDA)
 					.tipoDeMovimentacao(TipoDeMovimentacao.ENTRADA)
 					.user(v.getUser())
@@ -334,77 +327,5 @@ public class CarrinhoController {
 		return userService.getUserById(principal.getId());
 	}
 
-	// @RequestMapping(value = "search", method = RequestMethod.GET)
-	// public @ResponseBody List<Cliente> getCliente(@RequestParam String
-	// clienteNome) {
-	// System.out.println("aqui");
-	// return clienteService.getClienteByNameLike(clienteNome);
-	//
-	//
-	// }
-	//
-	// @RequestMapping(value = "search", method = RequestMethod.GET)
-	// @ResponseBody
-	// public List<String> search(HttpServletRequest request) {
-	// System.out.println("aqui");
-	// ObjectMapper mapper = new ObjectMapper();
-	// List<Cliente> list =
-	// clienteService.getClienteByNameLike(request.getParameter("term"));
-	// List<String> jsonRetorno = mapper.writeValueAsString(list);
-	// return jsonRetorno;
-	// }
-
-	// @RequestMapping(value = "/book/search", method = { RequestMethod.GET })
-	// public Collection<Book> list(@ModelAttribute("bookSearchCriteria")
-	// BookSearchCriteria criteria) {
-	// return this.bookstoreService.findBooks(criteria);
-	// }
-
-	// @RequestMapping(value = "json", method = RequestMethod.POST)
-	// public @ResponseBody String save(@RequestBody String jsonString) {
-	// ObjectMapper mapper = new ObjectMapper();
-	// Venda obj = new Venda();
-	// try {
-	// obj = mapper.readValue(jsonString, Venda.class);
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// List<Produto> listaProduto = new ArrayList<>();
-	// Produto produto = new Produto();
-	// produto.setNome("Produto 1");
-	// produto.setValorVenda(BigDecimal.valueOf(7));
-	// listaProduto.add(produto);
-	//
-	// obj.setListaProduto(listaProduto);
-	// String jsonRetorno = "";
-	// try {
-	// jsonRetorno = mapper.writeValueAsString(obj);
-	// } catch (JsonProcessingException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// return jsonRetorno;
-	// }
-	//
-	//
-	// @RequestMapping(value = "search", method = RequestMethod.GET)
-	// @ResponseBody
-	// public String search(HttpServletRequest request) {
-	// System.out.println(request.getParameter("term"));
-	// String search = produtoService.search(request.getParameter("term"));
-	// System.out.println(search);
-	// return search;
-	// }
-	//
-
-	// @RequestMapping(value = "teste")
-	// public String teste() {
-	// String search = produtoService.search("Novo Produto");
-	// System.out.println(search);
-	// return search;
-	// }
 
 }

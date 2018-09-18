@@ -1,7 +1,6 @@
 package br.com.lojapet.model;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -39,7 +37,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /*
  * 
@@ -71,21 +68,21 @@ public class Compra implements Serializable {
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm")
 	private Calendar dataEmissao;
-	
+
 	@NotNull
 	@NumberFormat(style = Style.NUMBER)
 	private BigDecimal subtotal;
 
 	@NumberFormat(style = Style.NUMBER)
 	private BigDecimal desconto;
-	
+
 	@NotNull
 	@NumberFormat(style = Style.NUMBER)
 	private BigDecimal total;
 
 	@Transient
 	private int parcelas;
-	
+
 	@Transient
 	private String enderecoPath;
 
@@ -103,45 +100,34 @@ public class Compra implements Serializable {
 			@Index(name = "compra_produto_fk", columnList = "compra_produto_id"),
 			@Index(name = "produto_compra_fk", columnList = "produto_compra_id") })
 	private List<Produto> listaProduto = new ArrayList<>();
-	
-	@OneToMany(cascade = CascadeType.PERSIST)
+
+	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "compra_pagamento_id", foreignKey = @ForeignKey(name = "pagamento_compra_fk"))
 	private List<Pagamento> contaAPagar = new ArrayList<>();
-	
+
 	public void montaCompra() {
 		if (this.dataEmissao == null) {
 			this.subtotal = this.total;
-			contaAPagar = Arrays.asList(Pagamento.builder()
-					.total(total)
-					.dataEmissao(this.dataEmissao)
-					.dataVencimento(this.dataEmissao)
-					.dataPagamento(this.dataEmissao)
-					.contaPaga(this)
-					.build());
+			contaAPagar = Arrays.asList(Pagamento.builder().total(total).dataEmissao(this.dataEmissao)
+					.dataVencimento(this.dataEmissao).dataPagamento(this.dataEmissao).contaPaga(this).build());
 		}
 
 	}
-	
+
 	public void gerarParcelas() {
 		List<Pagamento> novoParcelamento = new ArrayList<>();
-		BigDecimal valorParcelado= BigDecimal.ZERO;
-		if(this.total !=null) {
-			 valorParcelado = this.subtotal.divide(new BigDecimal(parcelas), 2, RoundingMode.HALF_UP);
+		BigDecimal valorParcelado = BigDecimal.ZERO;
+		if (this.total != null) {
+			valorParcelado = this.subtotal.divide(new BigDecimal(parcelas), 2, RoundingMode.HALF_UP);
 		}
 		Calendar dataVecimentoParcelamento;
 		for (int i = 1; i <= parcelas; i++) {
 			dataVecimentoParcelamento = (Calendar) this.dataEmissao.clone();
 			dataVecimentoParcelamento.add(Calendar.MONTH, i);
 
-			novoParcelamento.add(Pagamento.builder()
-					.total(valorParcelado)
-					.pago(BigDecimal.ZERO)
-					.aPagar(valorParcelado)
-					.dataEmissao(this.dataEmissao)
-					.dataVencimento(dataVecimentoParcelamento)
-					.estaQuitado(StatusConta.NAOQUITADO)
-					.contaPaga(this)
-					.build());
+			novoParcelamento.add(Pagamento.builder().total(valorParcelado).pago(BigDecimal.ZERO).aPagar(valorParcelado)
+					.dataEmissao(this.dataEmissao).dataVencimento(dataVecimentoParcelamento)
+					.estaQuitado(StatusConta.NAOQUITADO).contaPaga(this).build());
 
 		}
 		this.contaAPagar = novoParcelamento;
@@ -153,47 +139,77 @@ public class Compra implements Serializable {
 		if (this.dataEmissao == null) {
 			this.subtotal = this.total;
 			zeraQuantidadeParaTelaDeCompra();
-			this.dataEmissao=Calendar.getInstance();
-			contaAPagar = Arrays.asList(Pagamento.builder()
-					.total(total)
-					.dataEmissao(this.dataEmissao)
-					.dataVencimento(this.dataEmissao)
-					.dataPagamento(this.dataEmissao)
-					.contaPaga(this)
-					.build());
+			this.dataEmissao = Calendar.getInstance();
+			contaAPagar = Arrays.asList(Pagamento.builder().total(total).dataEmissao(this.dataEmissao)
+					.dataVencimento(this.dataEmissao).dataPagamento(this.dataEmissao).contaPaga(this).build());
 		}
-		
+
 	}
-	
+
 	public void preparaCompraParaPersistir(User logado) {
 		this.user = logado;
 		montaPagamentos();
-		
 
 	}
 
 	private void montaPagamentos() {
 		for (Pagamento pagamento : contaAPagar) {
-			if (pagamento.getDataVencimento() == this.dataEmissao) {
+			if (vencimentoMaiorQueEmissao(pagamento.getDataVencimento(), this.dataEmissao)) {
 				pagamento.setDataPagamento(this.dataEmissao);
 				pagamento.setDataEmissao(this.dataEmissao);
 				pagamento.setPago(pagamento.getTotal());
 				pagamento.setAPagar(BigDecimal.ZERO);
 				pagamento.setEstaQuitado(StatusConta.QUITADO);
-			}else {
+				pagamento.setObservacao(descricaoProdutos());
+				pagamento.pagamentoUmaVez();
+			} else {
 				pagamento.setAPagar(pagamento.getTotal());
 				pagamento.setDataEmissao(this.dataEmissao);
 				pagamento.setPago(BigDecimal.ZERO);
 				pagamento.setEstaQuitado(StatusConta.NAOQUITADO);
+				pagamento.setObservacao(descricaoProdutos());
+
 			}
-			
+
 		}
 	}
 	
+	private boolean vencimentoMaiorQueEmissao(Calendar vencimento, Calendar emissao) {
+		Calendar vencimentoClone = (Calendar) vencimento.clone();
+		Calendar emissaoClone = (Calendar) emissao.clone();
+		vencimentoClone.set(Calendar.HOUR_OF_DAY, 0);
+		vencimentoClone.set(Calendar.MINUTE, 0);
+		vencimentoClone.set(Calendar.SECOND, 0);
+		vencimentoClone.set(Calendar.MILLISECOND, 0);
+		emissaoClone.set(Calendar.HOUR_OF_DAY, 0);
+		emissaoClone.set(Calendar.MINUTE, 0);
+		emissaoClone.set(Calendar.SECOND, 0);
+		emissaoClone.set(Calendar.MILLISECOND, 0);
+
+		return vencimentoClone.equals(emissaoClone);
+	}
+
+	private String descricaoProdutos() {
+		String descricao = "";
+		for (Produto p : listaProduto) {
+			descricao = p.getQuantidade() + " x " + p.getNome();
+		}
+		return descricao;
+	}
 
 	private void zeraQuantidadeParaTelaDeCompra() {
 		for (Produto produto : listaProduto) {
 			produto.setQuantidade(1);
 		}
+	}
+
+	public void atualizaSubtotal() {
+		BigDecimal somatorio=BigDecimal.ZERO;
+		for (Produto p : listaProduto) {
+			somatorio =somatorio.add(new BigDecimal(p.getQuantidade()).multiply(p.getValorCusto()));
+			
+		}
+		this.subtotal= BigDecimal.ZERO;
+		this.subtotal=somatorio;
 	}
 }

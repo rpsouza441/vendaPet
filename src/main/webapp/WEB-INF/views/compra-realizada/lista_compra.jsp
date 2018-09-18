@@ -107,10 +107,8 @@
 					     <div class="alert alert-warning alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert"
 												aria-hidden="true">&times;</button>
-                <h5>
-												<i class="icon fa fa-ban"></i> <fmt:message
-													key="procurar.compra.mensagem.naoEcontrado" />
-											</h5>
+                <h5><i class="icon fa fa-ban"></i> <fmt:message key="procurar.compra.mensagem.naoEcontrado" />
+				</h5>
               </div>
 				            </c:if>
 				      
@@ -132,9 +130,10 @@
 									class="table table-bordered table-hover">
                 <thead>
 	                <tr>
-	                  <th width="50%"><fmt:message key="compra.lista.fornecedor" /></th>
-	                  <th width="40%"><fmt:message key="compra.lista.datEmissao" /></th>
-	                   <th width="10%"></th>
+	                  <th ><fmt:message key="compra.lista.fornecedor" /></th>
+	                  <th ><fmt:message key="compra.lista.datEmissao" /></th>
+	                   <th ></th>
+	                   <th></th>
 <!-- 	                    -->
 	                   
 	                </tr>
@@ -145,12 +144,18 @@
                   <td>${compra.fornecedor.nome }  </td>
                   <td><fmt:formatDate type = "date" 
          dateStyle = "short" timeStyle = "short" value = "${compra.dataEmissao.time }" />
-                 <td>
-                  <a rel="tooltip" class="btn btn-success" id="edit_event"
+                 <td width="5%" class="td-actions text-middle">
+                  <a  rel="tooltip" class="btn btn-success" id="edit_event"
 													href="<s:url value='/compra/visualizarCompra/${compra.id}' />">
 							 <i class="fa   fa-eye"></i> 
 						</a>  
 				 </td>
+				  <td width="5%" class="td-actions text-middle">
+						<a rel="tooltip" class="btn btn-danger" id="edit_event"
+													href="<s:url value='/compra/excluirCompra/${compra.id}' />">
+							 <i class="fa  fa-trash-o"></i> 
+						</a>
+					</td>
                 </tr>
                 </c:forEach>
                 

@@ -165,7 +165,7 @@
                 <td><fmt:message key="status.${conta.estaQuitado }" />  </td>
                  <td>
                   <a rel="tooltip" class="btn btn-success" id="edit_event"
-													href="<s:url value='/compra/visualizarCompra/${compra.id}' />">
+													href="<s:url value='/conta/editarContaPaga/${conta.id}' />">
 							 <i class="fa   fa-eye"></i> 
 						</a>  
 				 </td>

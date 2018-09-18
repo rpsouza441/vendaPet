@@ -124,10 +124,10 @@ $(document).ready(function() {
 	                </div>
 	                
 	                 
-	                  <div class="form-group col-lg-3"> 
+	                  <div class="form-group col-lg-4"> 
 		                 <label ><fmt:message key="compra.produto.quantidade" /></label>
 		                  <fmt:message key="compra.cadastro.quantidadePlaceHolder" var="quantidadePlaceHolder"/>
-		                  <form:input path="listaProduto[${contador.index}].quantidade" cssClass="form-control quantidadeProduto"  
+		                  <form:input path="listaProduto[${contador.index}].quantidade" name="quantidade" cssClass="form-control quantidadeProduto"  
 		                  placeholder="${quantidadePlaceHolder}" />
 		                  <form:errors path="listaProduto[${contador.index}].quantidade" class="text-danger" />
 	                </div> 
@@ -136,13 +136,26 @@ $(document).ready(function() {
 		              <div class="form-group col-lg-4"> 
 		                 <label ><fmt:message key="compra.produto.custo" /></label>
 		                  <fmt:message key="compra.cadastro.totalPlaceHolder" var="totalPlaceHolder"/>
-		                  <form:input path="listaProduto[${contador.index}].valorCusto" cssClass="form-control money valorCusto " 
+		                  <form:input path="listaProduto[${contador.index}].valorCusto" name="valorCusto" cssClass="form-control money valorCusto " 
 		                  placeholder="${totalPlaceHolder}" />
 		                  <form:errors path="listaProduto[${contador.index}].valorCusto" class="text-danger" />
 	                </div>
 	                
 	                
+	                
 	              </c:forEach>
+		              <div class="form-group col-lg-4"> 
+		                
+	                </div>
+		              <div class="form-group col-lg-4"> 
+		                
+	                </div>
+		              <div class="form-group col-lg-4"> 
+		                   <button class="btn btn-app " type="submit" id="atualizarButton" name="atualizar">
+				    <i class="fa fa-refresh"></i>
+				    	<fmt:message key="carrinho.td.atualizar" />
+				    	 </button> 
+	                </div>
 	              
 	               
 </div>

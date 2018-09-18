@@ -11,27 +11,6 @@
 <fmt:message key="compra.title" var="title" />
 <customTags:page title="${title}" listaCompra="active" >
 <jsp:attribute name="extraScripts">
-<!--  TouchSPin -->
- <script src="/resources/plugins/touchspin/jquery.bootstrap-touchspin.js"></script>
- <link rel="stylesheet" href="/resources/plugins/touchspin/jquery.bootstrap-touchspin.css">
- <script>
-            $("input[name='quantidade']").TouchSpin({
-                min: 1,
-                
-            });
-            
-            $("input[name='quantidade']").on('keyup keypress blur change', function(e) {
-            	    
-            	    var value = $(this).val();
-            	    var max_chars = parseInt($(this).attr('max'));
-            	    var min_chars = parseInt($(this).attr('min'));
-console.log(max_chars);
-            	    if ((value !== '') && (value.indexOf('.') === -1)) {
-            	        
-            	        $(this).val(Math.max(Math.min(value, max_chars), min_chars));
-            	    }
-            });
-  </script>
   
   <!-- datetimepicker -->
     <link rel="stylesheet" href="/resources/bower_components/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css">
@@ -80,7 +59,7 @@ console.log(max_chars);
              
              
  <c:if test="${carrinhoCompra.total >0}">	
-		<form:form action="${s:mvcUrl('CCC#fecharCompra').build()}" method="post"
+		<form:form action="${s:mvcUrl('CCC#finalizar').build()}" method="post"
 		modelAttribute="itensCarrinho" >
 
 <div class="col-xs-12">

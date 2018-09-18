@@ -50,10 +50,13 @@ public class RelatorioController {
 		List<Venda> listaVenda = new ArrayList<Venda>();
 		String error = null;
 
-		if (startWith != null) {
-			listaCompra = compraService.findCompraBetweenOrderByEmissao(startWith, endWith);
-			listaVenda = vendaService.findVendaBetweenOrderByEmissao(startWith, endWith);
+		if (startWith == null) {
+			startWith = Calendar.getInstance();
+			startWith.add(Calendar.MONTH, -12);
+			endWith= Calendar.getInstance();
 		}
+		listaCompra = compraService.findCompraBetweenOrderByEmissao(startWith, endWith);
+		listaVenda = vendaService.findVendaBetweenOrderByEmissao(startWith, endWith);
 
 		if (listaCompra.isEmpty() && listaVenda.isEmpty()) {
 			error = "error.empty";

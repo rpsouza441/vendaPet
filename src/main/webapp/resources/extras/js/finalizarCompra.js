@@ -31,6 +31,10 @@ $(document).on("change", "#parcela", function() {
 	
 
 });
+$(document).on("click", "#atualizarButton", function() {
+	$('#subtotal').val(numeroParaMoeda(0));
+
+});
 
 $(document).on("change", "#desconto", function() {
 
@@ -83,46 +87,6 @@ $(document).on("change", "#total", function() {
 	}
 
 });
-
-$(document).on("change", ".valorCusto", function() {
-	
-	var valorCusto = moedaParaNumero($('.valorCusto').val());
-	var quantidade = $('.quantidadeProduto').val();
-	var parcela = $('#parcelas').val();
-
-	if (valorCusto > 0 && quantidade > 0) {
-		var saida = valorCusto * quantidade;
-		$('#subtotal').val(numeroParaMoeda(saida.toFixed(2)));
-		$('#desconto').val(0);
-		$('#total').val(numeroParaMoeda(saida.toFixed(2)));
-		var totalParcelado = saida / parcela;
-		$(".totalParcelado").each(function(){
-			$(this).val(numeroParaMoeda(totalParcelado.toFixed(2)));
-		});
-		
-	}
-	
-});
-$(document).on("change", ".quantidadeProduto", function() {
-	
-	var valorCusto = moedaParaNumero($('.valorCusto').val());
-	var quantidade = $('.quantidadeProduto').val();
-	var parcela = $('#parcelas').val();
-
-	if (valorCusto > 0 && quantidade > 0) {
-		var saida = valorCusto * quantidade;
-		$('#subtotal').val(numeroParaMoeda(saida.toFixed(2)));
-		$('#desconto').val(0);
-		$('#total').val(numeroParaMoeda(saida.toFixed(2)));
-		var totalParcelado = saida / parcela;
-		$(".totalParcelado").each(function(){
-			$(this).val(numeroParaMoeda(totalParcelado.toFixed(2)));
-		});
-		
-	}
-	
-});
-
 
 
 

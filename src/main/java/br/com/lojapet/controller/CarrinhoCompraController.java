@@ -1,6 +1,7 @@
 package br.com.lojapet.controller;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,10 +30,8 @@ import br.com.lojapet.model.FormaDePagamento;
 import br.com.lojapet.model.Fornecedor;
 import br.com.lojapet.model.Produto;
 import br.com.lojapet.model.User;
-import br.com.lojapet.persistence.service.CaixaService;
 import br.com.lojapet.persistence.service.CompraService;
 import br.com.lojapet.persistence.service.FornecedorService;
-import br.com.lojapet.persistence.service.MovimentoDeCaixaService;
 import br.com.lojapet.persistence.service.ProdutoService;
 import br.com.lojapet.persistence.service.UserService;
 
@@ -54,13 +53,9 @@ public class CarrinhoCompraController {
 	private CarrinhoCompra carrinho;
 
 	@Autowired
-	private CaixaService caixaService;
-
-	@Autowired
-	private MovimentoDeCaixaService movimentoDeCaixaService;
-
-	@Autowired
 	private FornecedorService fornecedorService;
+
+	private List<Fornecedor> allFornecedors;
 
 	@RequestMapping(value = "lista", method = RequestMethod.GET)
 	public ModelAndView home(ModelAndView modelAndView) {
@@ -81,39 +76,56 @@ public class CarrinhoCompraController {
 
 	@RequestMapping("/removerDoCarrinho/{id}")
 	public ModelAndView remover(@PathVariable("id") UUID produtoId) {
-		System.out.println("removido");
-		System.out.println(produtoId);
 		carrinho.remover(createItem(produtoId));
-		// carrinho.remover(produtoId, tipoPreco);
-		return new ModelAndView("redirect:/carrinho");
+		return new ModelAndView("redirect:/compra/lista");
+	}
+
+	@RequestMapping(value = "/finalizar", method = RequestMethod.POST)
+	public ModelAndView finalizar(HttpServletRequest request) {
+
+		return new ModelAndView("redirect:/compra/fecharCompra");
+
 	}
 
 	// gera pagina finalizar
 	@RequestMapping(value = "fecharCompra")
-	public ModelAndView fecharCompra(Compra compra) {
+	public ModelAndView fecharCompra(Compra compra, HttpServletRequest request) {
+		System.out.println("get");
+
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/compra-realizada/finalizar_compra",
 				"redirect:/compra/procurarProduto");
+
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
 		compra.montaCompra(extraiListaDeProdutosEQuantidadeDoCarrinho());
 		compra.setParcelas(1);
 
 		modelAndView.addObject("compra", compra);
-		modelAndView.addObject("fornecedores", fornecedorService.getAllFornecedors());
+		modelAndView.addObject("fornecedores", geraFornecedores());
 
 		return modelAndView;
 	}
 
 	// atualiza a pagina de fechar
-	@RequestMapping(value = "fecharVenda", method = RequestMethod.POST)
+	@RequestMapping(value = "fecharCompra", method = RequestMethod.POST)
 	public ModelAndView atualizaFecharCompra(Compra compra) {
+		System.out.println("post");
+		System.out.println(compra.getSubtotal());
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/compra-realizada/finalizar_compra",
 				"redirect:/compra/procurarProduto");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
-		modelAndView.addObject("fornecedores", fornecedorService.getAllFornecedors());
+		modelAndView.addObject("fornecedores", geraFornecedores());
 		modelAndView.addObject("compra", compra);
 
 		return modelAndView;
+	}
+
+	private List<Fornecedor> geraFornecedores() {
+		if (allFornecedors==null) {
+			allFornecedors = fornecedorService.getAllFornecedors();
+
+		}
+		return allFornecedors;
 	}
 
 	@RequestMapping(value = "/limparCarrinho", method = RequestMethod.GET)
@@ -125,23 +137,29 @@ public class CarrinhoCompraController {
 
 	@RequestMapping(value = "finalizarCompra")
 	public ModelAndView finalizarCompra(@Valid Compra compra, BindingResult result, HttpServletRequest request) {
-
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("redirect:/", "redirect:/compra/procurarProduto");
 		if (carrinho.getItens().isEmpty()) {
 			return modelAndView;
 		}
-		
+		if (request.getParameter("atualizar") != null) {
+			compra.atualizaSubtotal();
+			System.out.println("atualiza");
+			return atualizaFecharCompra(compra);
+			
+		}
+
 		if (request.getParameter("gerarParcelas") != null) {
 			compra.gerarParcelas();
 			return atualizaFecharCompra(compra);
 
 		}
-		
+
 		if (compra.getFornecedor() == null) {
 			result.rejectValue("fornecedor", "field.required");
 		}
-		
+System.out.println("antes dos erros");
 		if (result.hasErrors()) {
+
 			System.out.println(result.getAllErrors());
 			return atualizaFecharCompra(compra);
 		}
@@ -151,8 +169,6 @@ public class CarrinhoCompraController {
 
 		return modelAndView;
 	}
-
-
 
 	@RequestMapping(value = "/procurarProduto")
 	public ModelAndView procurarProduto(@RequestParam(value = "search", required = false) String q,
@@ -179,17 +195,13 @@ public class CarrinhoCompraController {
 
 		adicionaQuantidadeNoEstoqueAlteraCustoELigaVendaCom(compraPersistida, logado);
 	}
-	
-	
 
 	private void adicionaQuantidadeNoEstoqueAlteraCustoELigaVendaCom(Compra compraPersistida, User logado) {
 		logado.addCompra(compraPersistida);
 		Fornecedor fornecedorById = fornecedorService.getFornecedorById(compraPersistida.getFornecedor().getId());
 		fornecedorById.addCompra(compraPersistida);
 		logado.addCompra(compraPersistida);
-		
-		
-		
+
 		fornecedorService.updateFornecedor(fornecedorById);
 		userService.updateUser(logado);
 		produtoService.novaCompra(compraPersistida.getListaProduto());
