@@ -9,7 +9,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<fmt:message key="conta.recebida.title" var="title" />
+<fmt:message key="conta.paga.title" var="title" />
 <customTags:page title="${title}" financeiroContaRecebida="active">
 	<jsp:attribute name="extraScripts">
 	<!-- DataTables -->
@@ -42,7 +42,7 @@
 <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-           <fmt:message key="conta.recebida.h1" />
+           <fmt:message key="conta.paga.h1" />
       </h1>
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i>
@@ -51,8 +51,8 @@
 							key="navegacao.financeiro" /></a></li>
         <li class="active"><a href="#"><fmt:message
 							key="navegacao.cadastro" /></a></li>
-        <li class="active"><a href="/compra"><fmt:message
-							key="navegacao.contaAReceber" /></a></li>
+        <li class="active"><a href="/conta/recebida"><fmt:message
+							key="navegacao.contaAPagar" /></a></li>
       </ol>
     </section>
 
@@ -70,7 +70,7 @@
             <!-- /.box-header -->
             <div class="box-body">
             <form:form
-								action="${s:mvcUrl('PC#listaRecebidaComSearch').build() }"
+								action="${s:mvcUrl('RPC#listaRecebidaComSearch').build() }"
 								id="form_search" method="post" modelAttribute="startWith"
 								autocomplete="off" data-toggle="validator">
 								
@@ -101,12 +101,12 @@
 									 </button>
 							 </div>
 														
+						
 				      
 				    </div>
 				    <div class="col-xs-3 ">
 				    </div>
 				    </div>
-				    
 				    <div class="col-xs-12 ">
 				    	<div class="col-xs-3 "> </div>
 					    <div class="col-xs-6 ">
@@ -141,14 +141,14 @@
 									class="table table-bordered table-hover">
                 <thead>
 	                <tr>
-	                  <th width="15%"><fmt:message key="conta.responsavel" /></th>
-	                  <th width="20%"><fmt:message key="conta.comprador" /></th>
-	                  <th width="10%"><fmt:message key="conta.dataEmissao" /></th>
-	                  <th width="9%"><fmt:message key="conta.dataVencimento" /></th>
-	                  <th width="9%"><fmt:message key="conta.total" /></th>
-	                  <th width="9%"><fmt:message key="conta.pago" /></th>
-	                  <th width="9%"><fmt:message key="conta.apagar" /></th>
-	                  <th width="9%"><fmt:message key="conta.status" /></th>
+	                  <th width="15%"><fmt:message key="conta.cliente" /></th>
+	                  <th width="20%"><fmt:message key="conta.obs" /></th>
+	                  <th width="13%"><fmt:message key="conta.dataEmissao" /></th>
+	                  <th width="13%"><fmt:message key="conta.dataVencimento" /></th>
+	                  <th width="8%"><fmt:message key="conta.total" /></th>
+	                  <th width="8%"><fmt:message key="conta.pago" /></th>
+	                  <th width="8%"><fmt:message key="conta.apagar" /></th>
+	                  <th width="10%"><fmt:message key="conta.status" /></th>
 	                   <th width="5%"></th>
 <!-- 	                    -->
 	                   
@@ -157,8 +157,8 @@
                 <tbody>
                 <c:forEach items="${contas}" var="conta">
                 <tr>
-                <td>${conta.contaRecebida.user.nome }  </td>
                 <td>${conta.contaRecebida.cliente.nomeCompleto }  </td>
+                <td>${conta.observacao }  </td>
                 <td><fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${conta.dataEmissao.time }" />
                   <td><fmt:formatDate type = "date"    dateStyle = "short" timeStyle = "short" value = "${conta.dataVencimento.time }" />
                 <td>${conta.total }  </td>
@@ -167,7 +167,7 @@
                 <td><fmt:message key="status.${conta.estaQuitado }" />  </td>
                  <td>
                   <a rel="tooltip" class="btn btn-success" id="edit_event"
-													href="<s:url value='/compra/visualizarCompra/${compra.id}' />">
+													href="<s:url value='/conta/editarContaRecebida/${conta.id}' />">
 							 <i class="fa   fa-eye"></i> 
 						</a>  
 				 </td>

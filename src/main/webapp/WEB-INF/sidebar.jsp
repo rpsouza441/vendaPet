@@ -18,12 +18,19 @@
 
 <%@attribute name="atendimentoCarrinho" required="false" %>
 
+<%@attribute name="relatorioCaixa" required="false" %>
+<%@attribute name="relatorioFluxo" required="false" %>
+<%@attribute name="relatorioReceber" required="false" %>
+<%@attribute name="relatorioRecebidas" required="false" %>
+<%@attribute name="relatorioPagar" required="false" %>
+<%@attribute name="relatorioPagas" required="false" %>
 
 <%@attribute name="listaGrupo" required="false" %>
 <%@attribute name="listaProduto" required="false" %>
 <%@attribute name="listaVenda" required="false" %>
 <%@attribute name="listaCaixa" required="false" %>
 <%@attribute name="listaCompra" required="false" %>
+<%@attribute name="listaUser" required="false" %>
 
 
 
@@ -235,13 +242,13 @@
               </a>
               <ul class="treeview-menu" style="display: block;">
                 <li class="${financeiroContaRecebida}">
-	          <a href="/conta/recebida">
+	          <a href="/conta/receber">
 	            <i class="fa fa-fw fa-sign-in"></i> <span>
 	            <fmt:message key="navegacao.contaAReceber" /></span>
 	          </a>
 	        </li>
 	        <li class="${financeiroContaPaga}">
-	          <a href="/conta/paga">
+	          <a href="/conta/pagar">
 	            <i class="fa fa-fw fa-sign-out"></i> <span>
 	            <fmt:message key="navegacao.contaAPagar" /></span>
 	          </a>
@@ -265,7 +272,14 @@
         
         
         <!-- arvore Relatorio  -->
-         <li class="treeview ">
+         <li class="treeview 
+         ${relatorioCaixa }
+         ${relatorioFluxo }
+         ${relatorioRecebidas }
+         ${relatorioReceber }
+         ${relatorioPagar }
+         ${relatorioPagas }
+         ">
           <a href="#">
             <i class="fa fa-fw fa-bar-chart-o"></i> <span>
             <fmt:message key="navegacao.relatorio" /></span>
@@ -274,43 +288,43 @@
             </span>
           </a>
           <ul class="treeview-menu">
-           <li class="${cadastroFornecedor}">
-			   <a href="/fornecedor/cadastro">
+           <li class="${relatorioCaixa}">
+			   <a href="/relatorio/caixa">
 			        <i class="fa fa-fw fa-inbox"></i> <span>
 			        <fmt:message key="navegacao.relatorio.gaveta" /></span>
 			   </a>
 	          </li>
 	          
-           <li class="${cadastroFornecedor}">
-			   <a href="/fornecedor/cadastro">
+           <li class="${relatorioFluxo}">
+			   <a href="/relatorio/fluxoCaixa">
 			        <i class="fa fa-fw fa-bar-chart"></i> <span>
 			        <fmt:message key="navegacao.relatorio.fluxo" /></span>
 			   </a>
 	        </li>
 	          
-           <li class="${cadastroFornecedor}">
-			   <a href="/fornecedor/cadastro">
+           <li class="${relatorioReceber}">
+			   <a href="/relatorio/contasAReceber">
 			        <i class="fa fa-fw fa-sign-in"></i> <span>
 			        <fmt:message key="navegacao.relatorio.contaReceber" /></span>
 			   </a>
 	       </li>
 	          
-           <li class="${cadastroFornecedor}">
-			   <a href="/fornecedor/cadastro">
+           <li class="${relatorioRecebidas}">
+			   <a href="/relatorio/contasRecebidas">
 			        <i class="fa fa-fw fa-sign-in"></i> <span>
 			        <fmt:message key="navegacao.relatorio.contaRecebidas" /></span>
 			   </a>
 	       </li>
 	          
-           <li class="${cadastroFornecedor}">
-			   <a href="/fornecedor/cadastro">
+           <li class="${relatorioPagar}">
+			   <a href="/relatorio/contasAPagar">
 			        <i class="fa fa-fw fa-sign-out"></i> <span>
 			        <fmt:message key="navegacao.relatorio.contaPagar" /></span>
 			   </a>
 	       </li>
 	          
-           <li class="${cadastroFornecedor}">
-			   <a href="/relatorio/conta/pagas">
+           <li class="${relatorioPagas}">
+			   <a href="/relatorio/contasPagas">
 			        <i class="fa fa-fw fa-sign-out"></i> <span>
 			        <fmt:message key="navegacao.relatorio.contaQuitadas" /></span>
 			   </a>
@@ -321,15 +335,10 @@
         
         
           
+  <li class="${listaUser}"><a href="/usuario"><i class="fa fa-fw fa-user "></i> <span><fmt:message key="navegacao.user" /></span></a></li>
         
   <li><a href="/logout"><i class=" fa fa-fw fa-power-off "></i> <span><fmt:message key="navegacao.logout" /></span></a></li>
-<!--         arvore de cadastro -->
         
-        
-        
-        
-        
-<!--         arvore relatorio -->
  
         
        

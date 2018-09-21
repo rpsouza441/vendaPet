@@ -65,9 +65,10 @@ public class FornecedorController {
 
 	@RequestMapping(value="gravarFornecedor", method = RequestMethod.POST)
 	public ModelAndView gravarFornecedor(@Valid Fornecedor fornecedor, BindingResult result) {
-
+		if (fornecedorService.existeComNome(fornecedor.getNome())) {
+			result.rejectValue("nome", "field.fornecedor.mustBe.Unique");
+		}
 		if (result.hasErrors()) {
-			System.out.println(result.getAllErrors());
 			return form(fornecedor);
 		}
 

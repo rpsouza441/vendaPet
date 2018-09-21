@@ -90,5 +90,11 @@ public class ClienteService {
 		}
 		return false;
 	}
+	public boolean existeComNomeCompleto(String nome) {
+		if (nome != null && nome != "") {
+			return dao.existsByNomeCompleto(nome);
+		}
+		return false;
+	}
 
 }

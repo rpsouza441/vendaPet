@@ -18,6 +18,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotEmpty;
 
@@ -57,7 +59,8 @@ public class User implements UserDetails {
 	@NotEmpty
 	private String nome;
 
-	@DateTimeFormat
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm")
 	private Calendar ultimoLogin;
 
 	@OneToMany
@@ -107,6 +110,15 @@ public class User implements UserDetails {
 
 	public void addCompra(Compra compraPersistida) {
 		listaCompra.add(compraPersistida);
+	}
+
+	public String getNomesDasPermissoes() {
+		String saida = "";
+		for (Role role : authorities) {
+			saida += role.getAuthority();
+
+		}
+		return saida;
 	}
 
 }

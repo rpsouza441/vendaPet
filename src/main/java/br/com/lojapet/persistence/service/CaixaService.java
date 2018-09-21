@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.lojapet.model.Caixa;
 import br.com.lojapet.model.MovimentoDeCaixa;
+import br.com.lojapet.model.Pagamento;
 import br.com.lojapet.persistence.repository.CaixaRepository;
 
 @Service
@@ -119,6 +120,11 @@ public class CaixaService {
 		}
 
 		return fechadoDataHora;
+
+	}
+
+	public List<Caixa> findCaixasPorDataFechamentoBetween(Calendar startWith, Calendar endWith) {
+		return dao.findCaixasPorDataFechamentoBetween(startWith, endWith);
 
 	}
 

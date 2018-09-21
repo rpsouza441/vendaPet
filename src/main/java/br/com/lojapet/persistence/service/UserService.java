@@ -90,4 +90,16 @@ public class UserService {
 		}
 	}
 
+	public List<User> search(String q) {
+		return dao.search(q);
+	}
+	
+	
+
+	public boolean existeComNome(String username) {
+		if (username != null && username != "") {
+			return dao.existsByUsername(username);
+		}
+		return false;
+	}
 }

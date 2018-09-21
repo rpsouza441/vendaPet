@@ -28,54 +28,21 @@ import br.com.lojapet.persistence.service.PagamentoService;
 
 @Controller
 @RequestMapping(value = "/conta")
-public class PagamentoController {
+public class PagarPagamentoController {
 
 	@Autowired
 	protected PagamentoService pagamentoService;
-	
+
 	@Autowired
-	protected PagamentoEfetuadoService pagamentoEfetuadoService ;
+	protected PagamentoEfetuadoService pagamentoEfetuadoService;
 
-	@RequestMapping(value = "recebida", method = RequestMethod.GET)
-	public ModelAndView listaRecebida(ModelAndView modelAndView) {
-		modelAndView = new ModelAndView("/conta/recebida/lista");
-
-		return modelAndView;
-	}
-
-	@RequestMapping(value = "recebida", method = RequestMethod.POST)
-	public ModelAndView listaRecebidaComSearch(
-			@RequestParam(value = "startWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar startWith,
-			@RequestParam(value = "endWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar endWith,
-			RedirectAttributes redirectAttributes) {
-		ModelAndView modelAndView = new ModelAndView("/conta/recebida/lista");
-
-		List<Pagamento> contasPagas;
-		String error = null;
-
-		if (startWith == null) {
-			contasPagas = pagamentoService.getAllContasRecebidas();
-		} else {
-			contasPagas = pagamentoService.findContasRecebidasPorDataVencimentoBetween(startWith, endWith);
-
-		}
-
-		if (contasPagas.isEmpty()) {
-			error = "error.empty";
-		}
-		modelAndView.addObject("error", error);
-		modelAndView.addObject("contas", contasPagas);
-		return modelAndView;
-
-	}
-
-	@RequestMapping(value = "paga", method = RequestMethod.GET)
+	@RequestMapping(value = "pagar", method = RequestMethod.GET)
 	public ModelAndView listaPaga(ModelAndView modelAndView) {
 		modelAndView = new ModelAndView("/conta/paga/lista");
 		return modelAndView;
 	}
 
-	@RequestMapping(value = "paga", method = RequestMethod.POST)
+	@RequestMapping(value = "pagar", method = RequestMethod.POST)
 	public ModelAndView listaPagaComSearch(
 			@RequestParam(value = "startWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar startWith,
 			@RequestParam(value = "endWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar endWith,
@@ -86,11 +53,11 @@ public class PagamentoController {
 		String error = null;
 
 		if (startWith == null) {
-			contasPagas = pagamentoService.getAllContasPagas();
-		} else {
-			contasPagas = pagamentoService.findContasPagasPorDataVencimentoBetween(startWith, endWith);
-
+			startWith = Calendar.getInstance();
+			startWith.set(Calendar.DAY_OF_YEAR, 1);
+			endWith = Calendar.getInstance();
 		}
+		contasPagas = pagamentoService.findContasPagasPorDataVencimentoBetween(startWith, endWith);
 
 		if (contasPagas.isEmpty()) {
 			error = "error.empty";
@@ -102,7 +69,7 @@ public class PagamentoController {
 	}
 
 	@RequestMapping(value = "/editarContaPaga/{uuid}")
-	public ModelAndView visualizarCompra(@PathVariable(value = "uuid") UUID uuid) {
+	public ModelAndView editarContaPaga(@PathVariable(value = "uuid") UUID uuid) {
 		Pagamento pagamento = pagamentoService.getPagamentoById(uuid);
 		PagamentoEditForm pagamentoEditForm = new PagamentoEditForm(pagamento);
 
@@ -110,13 +77,12 @@ public class PagamentoController {
 
 	}
 
-	@RequestMapping(value = "cadastro")
+	@RequestMapping(value = "/pagar/cadastro")
 	public ModelAndView formAPagar(PagamentoEditForm pagamentoEditForm) {
 		ModelAndView modelAndView = new ModelAndView("/conta/paga/edit");
 		modelAndView.addObject("pagamentoEditForm", pagamentoEditForm);
 		return modelAndView;
 	}
-
 
 	@RequestMapping(value = "gravarContaAPagar", method = RequestMethod.POST)
 	public ModelAndView gravarContaAPagar(@Valid PagamentoEditForm pagamentoEditForm, BindingResult result,
@@ -124,11 +90,20 @@ public class PagamentoController {
 
 		if (request.getParameter("cancelar") != null) {
 			pagamentoService.cancelaPagamento(pagamentoEditForm.getId());
-			return new ModelAndView("redirect:/conta/paga");
+			return new ModelAndView("redirect:/conta/pagar");
+
 		} else if (request.getParameter("baixa") != null) {
 			PagamentoEfetuado pagamentoEfetuado = new PagamentoEfetuado();
 			pagamentoEfetuado.montaParaBaixa(pagamentoEditForm);
 			return formBaixaAPagar(pagamentoEfetuado);
+
+		} else if (request.getParameter("estornar") != null) {
+			Pagamento pagamentoById = pagamentoService.getPagamentoById(pagamentoEditForm.getId());
+			pagamentoEfetuadoService.deletePagamentoEfetuado(pagamentoById.getListaPagamentosEfetuados());
+			;
+			pagamentoService.estornar(pagamentoEditForm.getId());
+			return new ModelAndView("redirect:/conta/pagar");
+
 		}
 		if (result.hasErrors()) {
 			return formAPagar(pagamentoEditForm);
@@ -136,11 +111,11 @@ public class PagamentoController {
 
 		pagamentoService.updateCom(pagamentoEditForm);
 
-		return new ModelAndView("redirect:/conta/paga");
+		return new ModelAndView("redirect:/conta/pagar");
 
 	}
-	
-	@RequestMapping(value = "baixa")
+
+	@RequestMapping(value = "/pagar/baixa")
 	public ModelAndView formBaixaAPagar(PagamentoEfetuado pagamentoEfetuado) {
 		ModelAndView modelAndView = new ModelAndView("/conta/paga/baixa");
 		modelAndView.addObject("pagamentoEfetuado", pagamentoEfetuado);
@@ -149,40 +124,35 @@ public class PagamentoController {
 		return modelAndView;
 	}
 
-	
-	
 	@RequestMapping(value = "baixaContaAPagar", method = RequestMethod.POST)
 	public ModelAndView baixaContaAPagar(@Valid PagamentoEfetuado pagamentoEfetuado, BindingResult result) {
-		
-		if(pagamentoEfetuado.getPago().compareTo(pagamentoEfetuado.getSaldoDevedor()) > 0) {
+
+		if (pagamentoEfetuado.getPago().compareTo(pagamentoEfetuado.getSaldoDevedor()) > 0) {
 			result.rejectValue("pago", "field.maiorQueTotal");
 
 		}
-		if(pagamentoEfetuado.getPago().compareTo(BigDecimal.ZERO) == 0) {
+		if (pagamentoEfetuado.getPago().compareTo(BigDecimal.ZERO) == 0) {
 			result.rejectValue("pago", "field.zero");
-			
+
 		}
-		
+
 		if (result.hasErrors()) {
 			return formBaixaAPagar(pagamentoEfetuado);
 		}
-		
-		
-		Pagamento pagamento = pagamentoService.getPagamentoById(pagamentoEfetuado.getPagamento().getId());
-		
-		pagamentoEfetuado.setPagamento(pagamento);
-		
-		PagamentoEfetuado savePagamentoEfetuadoWithReturn = pagamentoEfetuadoService.savePagamentoEfetuadoWithReturn(pagamentoEfetuado);
-		
-		pagamento.baixa(savePagamentoEfetuadoWithReturn);
-		
-		pagamentoService.updatePagamento(pagamento);
-		
-		
 
-		return new ModelAndView("redirect:/conta/paga");
+		Pagamento pagamento = pagamentoService.getPagamentoById(pagamentoEfetuado.getPagamento().getId());
+
+		pagamentoEfetuado.setPagamento(pagamento);
+
+		PagamentoEfetuado savePagamentoEfetuadoWithReturn = pagamentoEfetuadoService
+				.savePagamentoEfetuadoWithReturn(pagamentoEfetuado);
+
+		pagamento.baixa(savePagamentoEfetuadoWithReturn);
+
+		pagamentoService.updatePagamento(pagamento);
+
+		return new ModelAndView("redirect:/conta/pagar");
 
 	}
-
 
 }

@@ -87,7 +87,7 @@
 							key="navegacao.financeiro" /></a></li>
         <li class="active"><a href="#"><fmt:message
 							key="navegacao.controle" /></a></li>
-        <li class="active"><a href="/conta"><fmt:message
+        <li class="active"><a href="/conta/paga"><fmt:message
 							key="navegacao.contaAPagar" /></a></li>
       </ol>
     </section>
@@ -110,7 +110,7 @@
             <!-- /.box-header -->
             <!-- form start -->
             <form:form
-							action="${s:mvcUrl('PC#gravarContaAPagar').build() }"
+							action="${s:mvcUrl('PPC#gravarContaAPagar').build() }"
 							method="post" modelAttribute="pagamentoEditForm"
 							autocomplete="off">
             
@@ -232,24 +232,64 @@
 	              
 	              <!-- /.box-body -->
               <div class="box-footer">
-              <div class="form-group col-lg-4">
+              <div class="form-group col-lg-3">
                 	<button type="submit"
 										class="btn btn-primary pull-right btn-lg btn-block">
 						<fmt:message key="cadastro.salvar" />
 					</button>
 					<div class="clearfix"></div>
 			  </div>
-              <div class="form-group col-lg-4">
+              <div class="form-group col-lg-3">
+            
                 	<button type="submit" name="cancelar"
-										class="btn btn-primary pull-right btn-lg btn-block">
+                	
+					 <c:choose>
+    						<c:when test="${( empty pagamentoEditForm.listaPagamentosEfetuados) && (pagamentoEditForm.estaQuitado == 'NAOQUITADO' || pagamentoEditForm.estaQuitado != 'CANCELADO' )}">
+                	  
+										class="btn btn-primary pull-right btn-lg btn-block "
+                	 </c:when>    
+    					<c:otherwise>
+                	  					class="btn btn-primary pull-right btn-lg btn-block disabled"
+						  </c:otherwise>
+					</c:choose>
+										
+										>
 						<fmt:message key="cadastro.cancelar" />
 					</button>
 					<div class="clearfix"></div>
 			  </div>
-              <div class="form-group col-lg-4">
+              <div class="form-group col-lg-3">
                 	<button type="submit" name="baixa"
-										class="btn btn-primary pull-right btn-lg btn-block">
+                	  <c:choose>
+    						<c:when test="${pagamentoEditForm.estaQuitado == 'QUITADO'}">
+                	  										class="btn btn-primary pull-right btn-lg btn-block disabled"
+                	  
+                	 </c:when>    
+    					<c:otherwise>
+										class="btn btn-primary pull-right btn-lg btn-block "
+						  </c:otherwise>
+					</c:choose>
+										>
 						<fmt:message key="cadastro.baixa" />
+					</button>
+					<div class="clearfix"></div>
+			  </div>
+              <div class="form-group col-lg-3">
+                	<button type="submit" name="estornar"
+                	
+					<c:choose>
+    						<c:when test="${not empty pagamentoEditForm.listaPagamentosEfetuados}">
+                	  
+										class="btn btn-primary pull-right btn-lg btn-block "
+                	 </c:when>    
+    					<c:otherwise>
+                	  										class="btn btn-primary pull-right btn-lg btn-block disabled"
+						  </c:otherwise>
+					</c:choose>
+										
+										
+										>
+						<fmt:message key="cadastro.estornar" />
 					</button>
 					<div class="clearfix"></div>
 			  </div>

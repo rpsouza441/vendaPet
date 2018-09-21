@@ -130,6 +130,58 @@ public class Pagamento implements Serializable {
 		listaPagamentosEfetuados.add(efetuado);
 		
 	}
+
+	public void estorno() {
+		estaQuitado=(StatusConta.NAOQUITADO);
+		pago=(BigDecimal.ZERO);
+		aPagar=(total);
+		listaPagamentosEfetuados = new ArrayList<>();
+		
+	}
+
+	public void cancelar() {
+		estaQuitado =(StatusConta.CANCELADO);
+		
+	}
+
+	public void geraPagamentoEfetuado(String observacao) {
+		PagamentoEfetuado efetuado= PagamentoEfetuado.builder()
+									.pago(this.pago)
+									.observacao(observacao)
+									.dataPagamento(this.dataPagamento)
+									.formaDePagamento(this.formaDePagamento)
+									.pagamento(this)
+									.build();
+		this.listaPagamentosEfetuados.add(efetuado);
+		
+			
+		
+	}
+
+	public void geraPagamentoEfetuado() {
+		PagamentoEfetuado efetuado= PagamentoEfetuado.builder()
+				.pago(this.pago)
+				.dataPagamento(this.dataPagamento)
+				.formaDePagamento(this.formaDePagamento)
+				.pagamento(this)
+				.build();
+		this.listaPagamentosEfetuados.add(efetuado);		
+	}
+
+	public boolean vencimentoMaiorQueEmissao(Calendar emissao) {
+		Calendar vencimentoClone = (Calendar) dataVencimento.clone();
+		Calendar emissaoClone = (Calendar) emissao.clone();
+		vencimentoClone.set(Calendar.HOUR_OF_DAY, 0);
+		vencimentoClone.set(Calendar.MINUTE, 0);
+		vencimentoClone.set(Calendar.SECOND, 0);
+		vencimentoClone.set(Calendar.MILLISECOND, 0);
+		emissaoClone.set(Calendar.HOUR_OF_DAY, 0);
+		emissaoClone.set(Calendar.MINUTE, 0);
+		emissaoClone.set(Calendar.SECOND, 0);
+		emissaoClone.set(Calendar.MILLISECOND, 0);
+
+		return vencimentoClone.equals(emissaoClone);
+	}
 	
 	
 

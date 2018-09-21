@@ -66,5 +66,27 @@ public class MovimentoDeCaixa {
 	@JoinColumn(name = "caixa_movimento_id", foreignKey = @ForeignKey(name = "movimento_caixa_fk"))
 	private Caixa caixa;
 	
+	public void geraUmMovimentoEntradaVenda(PagamentoEfetuado pe, Caixa caixaAberto, User u) {
+		this.dataHoraMovimento=pe.getDataPagamento();
+		this.valor=pe.getPago();
+		this.formaDePagamento= pe.getFormaDePagamento();
+		this.observacao=pe.getObservacao();
+		this.origemMovimento= OrigemMovimento.VENDA;
+		this.tipoDeMovimentacao= TipoDeMovimentacao.ENTRADA;
+		this.user= u;
+		this.caixa=caixaAberto;
+	}
+	public void geraUmMovimentoEntradaBaixa(PagamentoEfetuado pe, Caixa caixaAberto, User u) {
+		this.dataHoraMovimento=pe.getDataPagamento();
+		this.valor=pe.getPago();
+		this.formaDePagamento= pe.getFormaDePagamento();
+		this.observacao=pe.getObservacao();
+		this.origemMovimento= OrigemMovimento.BAIXA;
+		this.tipoDeMovimentacao= TipoDeMovimentacao.ENTRADA;
+		this.user= u;
+		this.caixa=caixaAberto;
+	}
+
+	
 
 }

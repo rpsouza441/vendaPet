@@ -80,6 +80,8 @@ public class Compra implements Serializable {
 	@NumberFormat(style = Style.NUMBER)
 	private BigDecimal total;
 
+	private String observacao="";
+
 	@Transient
 	private int parcelas;
 
@@ -108,8 +110,14 @@ public class Compra implements Serializable {
 	public void montaCompra() {
 		if (this.dataEmissao == null) {
 			this.subtotal = this.total;
-			contaAPagar = Arrays.asList(Pagamento.builder().total(total).dataEmissao(this.dataEmissao)
-					.dataVencimento(this.dataEmissao).dataPagamento(this.dataEmissao).contaPaga(this).build());
+			contaAPagar = Arrays
+					.asList(Pagamento.builder()
+							.total(total)
+							.dataEmissao(this.dataEmissao)
+							.dataVencimento(this.dataEmissao)
+							.dataPagamento(this.dataEmissao)
+							.contaPaga(this)
+							.build());
 		}
 
 	}
@@ -154,7 +162,8 @@ public class Compra implements Serializable {
 
 	private void montaPagamentos() {
 		for (Pagamento pagamento : contaAPagar) {
-			if (vencimentoMaiorQueEmissao(pagamento.getDataVencimento(), this.dataEmissao)) {
+//			System.out.println(pagamento.);
+			if (pagamento.vencimentoMaiorQueEmissao(this.dataEmissao)) {
 				pagamento.setDataPagamento(this.dataEmissao);
 				pagamento.setDataEmissao(this.dataEmissao);
 				pagamento.setPago(pagamento.getTotal());
@@ -162,6 +171,13 @@ public class Compra implements Serializable {
 				pagamento.setEstaQuitado(StatusConta.QUITADO);
 				pagamento.setObservacao(descricaoProdutos());
 				pagamento.pagamentoUmaVez();
+				pagamento.geraPagamentoEfetuado();
+//				if(cliente==null) {
+//					pagamento.geraPagamentoEfetuado("");
+//				}else {
+//					pagamento.geraPagamentoEfetuado("Cliente "+cliente.getNomeCompleto());
+//					
+//				}
 			} else {
 				pagamento.setAPagar(pagamento.getTotal());
 				pagamento.setDataEmissao(this.dataEmissao);
@@ -173,7 +189,7 @@ public class Compra implements Serializable {
 
 		}
 	}
-	
+
 	private boolean vencimentoMaiorQueEmissao(Calendar vencimento, Calendar emissao) {
 		Calendar vencimentoClone = (Calendar) vencimento.clone();
 		Calendar emissaoClone = (Calendar) emissao.clone();
@@ -198,18 +214,29 @@ public class Compra implements Serializable {
 	}
 
 	private void zeraQuantidadeParaTelaDeCompra() {
-		for (Produto produto : listaProduto) {
-			produto.setQuantidade(1);
+		for (Produto p : listaProduto) {
+			p.setQuantidade(1);
+			this.observacao+=p.getQuantidade() + " x " + p.getNome()+" ";
+
 		}
 	}
 
 	public void atualizaSubtotal() {
-		BigDecimal somatorio=BigDecimal.ZERO;
+		BigDecimal somatorio = BigDecimal.ZERO;
+		this.observacao="";
 		for (Produto p : listaProduto) {
-			somatorio =somatorio.add(new BigDecimal(p.getQuantidade()).multiply(p.getValorCusto()));
-			
+			somatorio = somatorio.add(new BigDecimal(p.getQuantidade()).multiply(p.getValorCusto()));
+			this.observacao+=p.getQuantidade() + " x " + p.getNome()+" ";
+
 		}
-		this.subtotal= BigDecimal.ZERO;
-		this.subtotal=somatorio;
+		this.subtotal = BigDecimal.ZERO;
+		this.subtotal = somatorio;
+	}
+
+	public void geraObservacao(List<Produto> list) {
+		for (Produto p : list) {
+			this.observacao+=p.getQuantidade() + " x " + p.getNome()+" ";
+				
+		}
 	}
 }

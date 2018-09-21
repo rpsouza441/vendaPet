@@ -32,10 +32,9 @@ import br.com.lojapet.model.CarrinhoItem;
 import br.com.lojapet.model.Cliente;
 import br.com.lojapet.model.FormaDePagamento;
 import br.com.lojapet.model.MovimentoDeCaixa;
-import br.com.lojapet.model.OrigemMovimento;
 import br.com.lojapet.model.Pagamento;
+import br.com.lojapet.model.PagamentoEfetuado;
 import br.com.lojapet.model.Produto;
-import br.com.lojapet.model.TipoDeMovimentacao;
 import br.com.lojapet.model.User;
 import br.com.lojapet.model.Venda;
 import br.com.lojapet.persistence.service.CaixaService;
@@ -132,9 +131,9 @@ public class CarrinhoController {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
 				"redirect:/venda/procurarProduto");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
-System.out.println("get");
 		venda.montaVenda(carrinho.getValorTotal());
 		venda.setParcelas(1);
+		venda.geraObservacao(extraiListaDeProdutosEQuantidadeDoCarrinho());
 
 		modelAndView.addObject("venda", venda);
 
@@ -145,7 +144,6 @@ System.out.println("get");
 	public ModelAndView atualizaFecharVenda(Venda venda) {
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/venda/finalizar_venda",
 				"redirect:/venda/procurarProduto");
-		System.out.println("post");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
 
 		venda.montaVenda(carrinho.getValorTotal());
@@ -185,15 +183,7 @@ System.out.println("get");
 		return modelAndView;
 	}
 
-	private void verificaSeClientePossuIDESeExiste(Venda venda, BindingResult result) {
-		if ((!(venda.getCliente().getNomeCompleto() == null || venda.getCliente().getNomeCompleto() == ""))
-				&& venda.getCliente().getId() == null) {
-			if (!clienteService.existsById(venda.getCliente().getId())) {
-				result.rejectValue("cliente", "field.required");
-			}
-		}
-	}
-	//
+
 
 	@RequestMapping(value = "search", method = RequestMethod.GET)
 	@ResponseBody
@@ -245,7 +235,8 @@ System.out.println("get");
 		if(vendaASerPersistida.getCliente().getId()!= null) {
 			 cliente = clienteService.getClienteById(vendaASerPersistida.getCliente().getId());
 		}
-
+		
+		
 		List<Produto> produtos = extraiListaDeProdutosEQuantidadeDoCarrinho();
 
 		Caixa caixaAberto = caixaService.getCaixaAberto();
@@ -261,7 +252,8 @@ System.out.println("get");
 
 	private void removeQuantidadeDoEstoqueELigaVendaCom(Caixa caixaAberto, Venda vendaPersistida,
 			User logado, Cliente cliente) {
-		resolveLigacoesCaixaMovimento(caixaAberto, vendaPersistida);
+			resolveLigacoesCaixaMovimento(caixaAberto, vendaPersistida, logado);
+
 		logado.addVenda(vendaPersistida);
 		
 		if(vendaPersistida.getCliente()!=null) {
@@ -274,29 +266,30 @@ System.out.println("get");
 		produtoService.removeQuantidade(carrinho.getUuidEQuantidade());
 	}
 
-	private void resolveLigacoesCaixaMovimento(Caixa caixaAberto, Venda vendaPersistida) {
-		List<MovimentoDeCaixa> movimentoEntrada = geraMovimentoDeCaixaDeVenda(vendaPersistida, caixaAberto);
-		List<MovimentoDeCaixa> movimentoDeCaixaPersistido = movimentoDeCaixaService
-				.saveMovimentoDeCaixaWithReturn(movimentoEntrada);
-		caixaAberto.addListaMovimentacao(movimentoDeCaixaPersistido);
+	private void resolveLigacoesCaixaMovimento(Caixa caixaAberto, Venda vendaPersistida, User logado) {
+				
+		
+		List<MovimentoDeCaixa> listaMovimentoDeCaixa= geraMovimentosDeCaixa(vendaPersistida, caixaAberto, logado);
+
+		List<MovimentoDeCaixa> listaMovimentoDeCaixaPersistido = movimentoDeCaixaService
+				.saveMovimentoDeCaixaWithReturn(listaMovimentoDeCaixa);
+		caixaAberto.addListaMovimentacao(listaMovimentoDeCaixaPersistido);
 	}
 
-	private List<MovimentoDeCaixa> geraMovimentoDeCaixaDeVenda(Venda v, Caixa caixaAberto) {
-		List<MovimentoDeCaixa> listaMovimento = new ArrayList<MovimentoDeCaixa>();
-		for (Pagamento p : v.getContaAReceber()) {
-			listaMovimento.add(MovimentoDeCaixa.builder()
-					.dataHoraMovimento(v.getDataEmissao())
-					.valor(p.getTotal())
-					.observacao(v.getDadosCliente())
-					.origemMovimento(OrigemMovimento.VENDA)
-					.tipoDeMovimentacao(TipoDeMovimentacao.ENTRADA)
-					.user(v.getUser())
-					.caixa(caixaAberto)
-					.build());
+
+	private List<MovimentoDeCaixa> geraMovimentosDeCaixa(Venda vendaPersistida, Caixa caixaAberto, User logado) {
+		List<MovimentoDeCaixa> listaDeMovimentoDeCaixa = new ArrayList<MovimentoDeCaixa>();
+		for (Pagamento p : vendaPersistida.getContaAReceber()) {
+			for (PagamentoEfetuado pe : p.getListaPagamentosEfetuados()) {
+				MovimentoDeCaixa mc = new MovimentoDeCaixa();
+				mc.geraUmMovimentoEntradaVenda(pe, caixaAberto, logado);
+				listaDeMovimentoDeCaixa.add(mc);
+				
+			}
 		}
 		
-
-		return listaMovimento;
+		
+		return listaDeMovimentoDeCaixa;
 	}
 
 	private List<Produto> extraiListaDeProdutosEQuantidadeDoCarrinho() {
@@ -305,6 +298,14 @@ System.out.println("get");
 		return produtos;
 	}
 
+	private void verificaSeClientePossuIDESeExiste(Venda venda, BindingResult result) {
+		if ((!(venda.getCliente().getNomeCompleto() == null || venda.getCliente().getNomeCompleto() == ""))
+				&& venda.getCliente().getId() == null) {
+			if (!clienteService.existsById(venda.getCliente().getId())) {
+				result.rejectValue("cliente", "field.required");
+			}
+		}
+	}
 	private ModelAndView redirecionaSeCarrinhoEstaVazio(String urlSePreenchido, String urlSeVazio) {
 		ModelAndView modelAndView;
 		if (carrinho.getItens().isEmpty()) {

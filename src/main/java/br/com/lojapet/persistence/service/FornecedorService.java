@@ -114,6 +114,12 @@ public class FornecedorService {
 		return false;
 	}
 
+	public boolean existeComNome(String nome) {
+		if (nome != null && nome != "") {
+			return dao.existsByNome(nome);
+		}
+		return false;
+	}
 	
 
 }

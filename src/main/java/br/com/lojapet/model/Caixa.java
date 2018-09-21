@@ -1,6 +1,7 @@
 package br.com.lojapet.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -35,7 +36,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 public class Caixa implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -45,11 +46,11 @@ public class Caixa implements Serializable {
 	private UUID id;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@DateTimeFormat(pattern="dd/MM/yyyy hh:mm")
+	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm")
 	private Calendar abertoDataHora;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@DateTimeFormat(pattern="dd/MM/yyyy hh:mm")
+	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm")
 	private Calendar fechadoDataHora;
 
 	private boolean isAberto = Boolean.TRUE;
@@ -71,5 +72,20 @@ public class Caixa implements Serializable {
 			addMovimentacao(movimentoDeCaixa);
 		}
 	}
+	public void addListaMovimentacao(MovimentoDeCaixa movimentoDeCaixaPersistido) {
+			addMovimentacao(movimentoDeCaixaPersistido);
+	}
+
+	public BigDecimal getTotalCaixa() {
+		BigDecimal total = BigDecimal.ZERO;
+		for (MovimentoDeCaixa movimentoDeCaixa : listaMovimentacoes) {
+			total = total.add(movimentoDeCaixa.getValor());
+		}
+		return total;
+
+	}
+	
+
+	
 
 }

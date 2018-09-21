@@ -4,25 +4,29 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import br.com.lojapet.model.Caixa;
 import br.com.lojapet.model.Compra;
 import br.com.lojapet.model.Pagamento;
 import br.com.lojapet.model.Venda;
+import br.com.lojapet.persistence.service.CaixaService;
 import br.com.lojapet.persistence.service.CompraService;
 import br.com.lojapet.persistence.service.PagamentoService;
 import br.com.lojapet.persistence.service.VendaService;
 
 @Controller
-public class RelatorioController {
+public class RelatorioFluxoCaixaController {
 
 	@Autowired
 	protected CompraService compraService;
@@ -32,10 +36,13 @@ public class RelatorioController {
 
 	@Autowired
 	protected PagamentoService pagamentoService;
-	
+
+	@Autowired
+	protected CaixaService caixaService;
+
 	@RequestMapping(value = "/sistema/fluxoCaixa")
 	public ModelAndView fluxoCaixa(ModelAndView modelAndView) {
-		modelAndView = new ModelAndView("/caixa/fluxo_caixa");
+		modelAndView = new ModelAndView("/relatorio/fluxo/fluxo_caixa");
 
 		return modelAndView;
 	}
@@ -45,7 +52,7 @@ public class RelatorioController {
 			@RequestParam(value = "startWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar startWith,
 			@RequestParam(value = "endWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar endWith,
 			RedirectAttributes redirectAttributes) {
-		ModelAndView modelAndView = new ModelAndView("/caixa/fluxo_caixa");
+		ModelAndView modelAndView = new ModelAndView("/relatorio/fluxo/fluxo_caixa");
 		List<Compra> listaCompra = new ArrayList<Compra>();
 		List<Venda> listaVenda = new ArrayList<Venda>();
 		String error = null;
@@ -53,7 +60,7 @@ public class RelatorioController {
 		if (startWith == null) {
 			startWith = Calendar.getInstance();
 			startWith.add(Calendar.MONTH, -12);
-			endWith= Calendar.getInstance();
+			endWith = Calendar.getInstance();
 		}
 		listaCompra = compraService.findCompraBetweenOrderByEmissao(startWith, endWith);
 		listaVenda = vendaService.findVendaBetweenOrderByEmissao(startWith, endWith);
@@ -77,33 +84,55 @@ public class RelatorioController {
 
 	}
 
-	@RequestMapping(value = "/relatorio/conta/pagas")
-	public ModelAndView relatorioContaPaga(ModelAndView modelAndView) {
-		modelAndView = new ModelAndView("/relatorio/paga/lista");
+	@RequestMapping(value = "/relatorio/fluxoCaixa")
+	public ModelAndView relatoriofluxoCaixa(ModelAndView modelAndView) {
+		modelAndView = new ModelAndView("/relatorio/fluxo/relatorio_fluxo_caixa");
 
 		return modelAndView;
 	}
 
-	@RequestMapping(value = "/relatorio/conta/pagas", method = RequestMethod.POST)
-	public ModelAndView relatorioContaPagaComSearch(
+	@RequestMapping(value = "/relatorio/fluxoCaixa", method = RequestMethod.POST)
+	public ModelAndView relatoriofluxoCaixaComSearch(@RequestParam(value = "simples", required = false) String simples,
 			@RequestParam(value = "startWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar startWith,
 			@RequestParam(value = "endWith", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Calendar endWith,
 			RedirectAttributes redirectAttributes) {
-		ModelAndView modelAndView = new ModelAndView("/relatorio/paga/lista");
-		List<Pagamento> pagamentos = new ArrayList<Pagamento>();
+		ModelAndView modelAndView = new ModelAndView("/relatorio/fluxo/relatorio_fluxo_caixa");
+		List<Compra> listaCompra = new ArrayList<Compra>();
+		List<Venda> listaVenda = new ArrayList<Venda>();
 		String error = null;
+		boolean showTableHead = false;
 
-		if (startWith != null) {
-			pagamentos = pagamentoService.findContasPagasPorDataVencimentoPagasBetween(startWith, endWith);
+		if (startWith == null) {
+			startWith = Calendar.getInstance();
+			startWith.add(Calendar.MONTH, -12);
+			endWith = Calendar.getInstance();
 		}
 
-		if (pagamentos.isEmpty()) {
+		listaCompra = compraService.findCompraBetweenOrderByEmissao(startWith, endWith);
+		listaVenda = vendaService.findVendaBetweenOrderByEmissao(startWith, endWith);
+
+		if (listaCompra.isEmpty() && listaVenda.isEmpty()) {
 			error = "error.empty";
 		}
 
+		// Venda vendaDoMes = listaVenda.stream()
+		// .filter(venda ->
+		// startWith.get(Calendar.MONTH)==venda.getDataEmissao().get(Calendar.MONTH))
+		// .findAny()
+		// .orElse(new Venda());
+
+		modelAndView.addObject("inicio", startWith);
+		modelAndView.addObject("fim", endWith);
 
 		modelAndView.addObject("error", error);
-		modelAndView.addObject("pagamentos", pagamentos);
+		if (simples != null) {
+			modelAndView.addObject("compras", listaCompra);
+			modelAndView.addObject("vendas", listaVenda);
+			showTableHead=true;
+		}
+		modelAndView.addObject("showTableHead", showTableHead);
+		modelAndView.addObject("totalVenda", totalVenda(listaVenda));
+		modelAndView.addObject("totalCompra", totalCompra(listaCompra));
 		return modelAndView;
 
 	}

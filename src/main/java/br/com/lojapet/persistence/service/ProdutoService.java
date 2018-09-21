@@ -37,20 +37,19 @@ public class ProdutoService {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public void novaCompra(List<Produto> list) {
 		for (Produto p : list) {
 			Produto produtoById = getProdutoById(p.getId());
-			System.out.println("quantidade antes de ser alterada"+produtoById.getQuantidade());
+			System.out.println("quantidade antes de ser alterada" + produtoById.getQuantidade());
 			produtoById.adicionaQuantidadeAlteravalor(p.getQuantidade(), p.getValorCusto());
-			System.out.println("quantidade a adicionar"+p.getQuantidade());
-			
-			System.out.println("quantidade alteradada"+produtoById.getQuantidade());
-			
+			System.out.println("quantidade a adicionar" + p.getQuantidade());
+
+			System.out.println("quantidade alteradada" + produtoById.getQuantidade());
+
 			updateProduto(produtoById);
 		}
-		
+
 	}
 
 	@Transactional
@@ -169,6 +168,10 @@ public class ProdutoService {
 		return false;
 	}
 
-	
-
+	public boolean existeComNome(String nome) {
+		if (nome != null && nome != "") {
+			return dao.existsByNome(nome);
+		}
+		return false;
+	}
 }

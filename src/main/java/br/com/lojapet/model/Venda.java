@@ -76,6 +76,8 @@ public class Venda implements Serializable {
 
 	@NumberFormat(style = Style.NUMBER)
 	private BigDecimal total;
+	
+	private String observacao ="";
 
 	@Transient
 	private int parcelas;
@@ -148,14 +150,19 @@ public class Venda implements Serializable {
 
 	private void montaPagamentos() {
 		for (Pagamento pagamento : contaAReceber) {
-			if (vencimentoMaiorQueEmissao(pagamento.getDataVencimento(), this.dataEmissao)) {
+			if (pagamento.vencimentoMaiorQueEmissao(this.dataEmissao)) {
 				pagamento.setDataPagamento(this.dataEmissao);
 				pagamento.setDataEmissao(this.dataEmissao);
 				pagamento.setPago(pagamento.getTotal());
 				pagamento.setAPagar(BigDecimal.ZERO);
 				pagamento.setEstaQuitado(StatusConta.QUITADO);
 				pagamento.setObservacao(descricaoProdutos());
-				pagamento.pagamentoUmaVez();
+				if(cliente==null) {
+					pagamento.geraPagamentoEfetuado("");
+				}else {
+					pagamento.geraPagamentoEfetuado("Cliente "+cliente.getNomeCompleto());
+					
+				}
 
 			} else {
 				pagamento.setAPagar(pagamento.getTotal());
@@ -164,32 +171,26 @@ public class Venda implements Serializable {
 				pagamento.setEstaQuitado(StatusConta.NAOQUITADO);
 				pagamento.setObservacao(descricaoProdutos());
 
+
 			}
 
 		}
 	}
-
-	private boolean vencimentoMaiorQueEmissao(Calendar vencimento, Calendar emissao) {
-		Calendar vencimentoClone = (Calendar) vencimento.clone();
-		Calendar emissaoClone = (Calendar) emissao.clone();
-		vencimentoClone.set(Calendar.HOUR_OF_DAY, 0);
-		vencimentoClone.set(Calendar.MINUTE, 0);
-		vencimentoClone.set(Calendar.SECOND, 0);
-		vencimentoClone.set(Calendar.MILLISECOND, 0);
-		emissaoClone.set(Calendar.HOUR_OF_DAY, 0);
-		emissaoClone.set(Calendar.MINUTE, 0);
-		emissaoClone.set(Calendar.SECOND, 0);
-		emissaoClone.set(Calendar.MILLISECOND, 0);
-
-		return vencimentoClone.equals(emissaoClone);
-	}
-
+	
+	
 	private String descricaoProdutos() {
 		String descricao = "";
 		for (Produto p : listaProduto) {
 			descricao = p.getQuantidade() + " x " + p.getNome();
 		}
 		return descricao;
+	} 
+
+	public void geraObservacao(List<Produto> list) {
+		for (Produto p : list) {
+			this.observacao+=p.getQuantidade() + " x " + p.getNome()+" ";
+				
+		}
 	}
 
 }

@@ -1,5 +1,6 @@
 package br.com.lojapet.persistence.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -114,8 +115,16 @@ public class PagamentoService {
 
 	public void cancelaPagamento(UUID id) {
 		Pagamento pagamento = dao.getOne(id);
-		pagamento.setEstaQuitado(StatusConta.CANCELADO);
+		pagamento.cancelar();
 		updatePagamento(pagamento);
+
+	}
+	
+	public void estornar(UUID id) {
+		Pagamento pagamento = dao.getOne(id);
+		pagamento.estorno();
+		updatePagamento(pagamento);
+
 
 	}
 
@@ -172,6 +181,8 @@ public class PagamentoService {
 		return dao.findContasRecebidasDataVencimentoBetweenAndStatus(startWith, endWith, StatusConta.CANCELADO);
 
 	}
+
+
 
 	// public boolean produtoExisteCom(String nome) {
 	// if (nome != null && nome != "") {

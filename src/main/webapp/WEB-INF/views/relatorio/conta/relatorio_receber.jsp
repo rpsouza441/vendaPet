@@ -9,8 +9,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<fmt:message key="fluxoCaixa.title" var="title" />
-<customTags:page title="${title}" fluxoCaixa="active">
+<fmt:message key="relatorio.receber.title" var="title" />
+<customTags:page title="${title}" relatorioReceber="active">
 	<jsp:attribute name="extraScripts">
 	<!-- DataTables -->
 	<script
@@ -42,17 +42,15 @@
 <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-           <fmt:message key="fluxoCaixa.h1" />
+           <fmt:message key="relatorio.receber.h1" />
       </h1>
        <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i>
 					<fmt:message key="navegacao.home" /></a></li>
         <li class="active"><a href="#"><fmt:message
-							key="navegacao.financeiro" /></a></li>
-        <li class="active"><a href="#"><fmt:message
-							key="navegacao.controle" /></a></li>
-        <li class="active"><a href="/compra"><fmt:message
-							key="navegacao.fluxoCaixa" /></a></li>
+							key="navegacao.relatorio" /></a></li>
+        <li class="active"><a href="/relatorio/receber"><fmt:message
+							key="navegacao.relatorio.contaReceber" /></a></li>
       </ol>
     </section>
 
@@ -70,12 +68,12 @@
             <!-- /.box-header -->
             <div class="box-body">
             <form:form
-								action="${s:mvcUrl('RC#fluxoCaixaComSearch').build() }"
+								action="${s:mvcUrl('RCRC#relatorioReceberComSearch').build() }"
 								id="form_search" method="post" modelAttribute="startWith"
 								autocomplete="off" data-toggle="validator">
 								
 					
-				    <div class="col-xs-12 ">
+				    <div class="col-xs-12 hidden-print ">
 				    <div class="col-xs-3 ">
 				    </div>
 				    <div class="col-xs-6 ">
@@ -117,7 +115,7 @@
 	                		<button type="button" class="close" data-dismiss="alert"
 													aria-hidden="true">&times;</button>
 				                <h5><i class="icon fa fa-ban"></i> 
-				                <fmt:message key="procurar.fluxo.mensagem.naoEcontrado" />
+				                <fmt:message key="procurar.relatorio.receber.mensagem.naoEcontrado" />
 								</h5>
 	                       </div>
 					       </c:if>
@@ -136,73 +134,81 @@
            
            
            </form:form>
-             <div class="table-responsive">
-              <table id="example1"
-									class="table table-bordered table-hover">
+           <div class="visible-print">
+				<h1>
+					           <fmt:message key="relatorio.receber.h1" />
+					
+				</h1>
+			</div>
+			
+				<div class="box box-solid">
+				
+				
+				
+				
+				
+				
+				    
+			
+			
+			
+            <div class="box-body table-responsive no-padding">
+              <p>
+             <fmt:message key="fluxo.periodo" /> 
+             <fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${inicio.time }" />
+             <fmt:message key="fluxo.ate" /> 
+          
+             <fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${fim.time }" />
+             </p>
+                <table class="table borderless table-hover table-striped">
                 <thead>
 	                <tr>
-	                  <th width="20%"><fmt:message key="fluxo.responsavel" /></th>
-	                  <th width="15%"><fmt:message key="fluxo.dataEmissao" /></th>
-	                  <th width="10%"><fmt:message key="fluxo.subtotal" /></th>
+	                  <th width="15%"><fmt:message key="conta.cliente" /></th>
+	                  <th width="20%"><fmt:message key="conta.obs" /></th>
+	                  <th width="13%"><fmt:message key="conta.dataEmissao" /></th>
+	                  <th width="13%"><fmt:message key="conta.dataVencimento" /></th>
+	                  <th width="8%"><fmt:message key="conta.total" /></th>
+	                  <th width="8%"><fmt:message key="conta.pago" /></th>
+	                  <th width="8%"><fmt:message key="conta.apagar" /></th>
 <!-- 	                    -->
 	                   
 	                </tr>
                 </thead>
-                <tbody>
-                <c:forEach items="${compras}" var="compra">
+                    <tbody>
+                <c:forEach items="${contas}" var="conta">
                 <tr>
-                <td>${compra.user.nome }  </td>
-                <td><fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${compra.dataEmissao.time }" />
-                <td>${compra.total }  </td>
+                <td>${conta.contaRecebida.cliente.nomeCompleto }  </td>
+                <td>${conta.observacao }  </td>
+                <td><fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${conta.dataEmissao.time }" />
+                  <td><fmt:formatDate type = "date"    dateStyle = "short" timeStyle = "short" value = "${conta.dataVencimento.time }" />
+                <td>${conta.total }  </td>
+                <td>${conta.pago }  </td>
+                <td>${conta.APagar }  </td>
                 </tr>
                 </c:forEach>
                 
                 </tbody>
-                <tfoot>
+                  <tfoot>
                 <tr>
-                <td> </td>
-                <td><fmt:message key="fluxo.total" /></td>
-                <td>${totalCompra }</td>
                 </tr>
                 </tfoot>
               </table>
-              
-               
+               <div class="box-footer hidden-print">
+<!--                 <button type="submit" class="btn btn-default">Cancel</button> -->
+                	    <a  rel="tooltip" class="btn btn-primary pull-right "
+							 id="edit_event"   onclick="window.print()">
+						<fmt:message key="carrinho.imprimir" />
+							 <i	class="fa  fa-print"></i> 
+						</a>
+					<div class="clearfix"></div>
               </div>
-              
-              
-              
-             <div class="table-responsive">
-              <table id="example2"
-									class="table table-bordered table-hover">
-                <thead>
-	                <tr>
-	                  <th width="20%"><fmt:message key="fluxo.cliente" /></th>
-	                  <th width="15%"><fmt:message key="fluxo.dataEmissao" /></th>
-	                  <th width="10%"><fmt:message key="fluxo.subtotal" /></th>
-<!-- 	                    -->
-	                   
-	                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${vendas}" var="venda">
-                <tr>
-                <td>${venda.cliente.nomeCompleto }  </td>
-                <td><fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${venda.dataEmissao.time }" />
-                <td>${venda.total }  </td>
-                </tr>
-                </c:forEach>
                 
                 
-                </tbody>
-                <tfoot>
-                <tr>
-                <td> </td>
-                <td><fmt:message key="fluxo.total" /></td>
-                <td>${totalVenda }</td>
-                </tr>
-                </tfoot>
-              </table>
+                
+                
+                
+            
+              
               
                
               </div>

@@ -28,7 +28,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PagamentoEditForm implements Serializable{
 
-	private List<PagamentoEfetuado> listaPagamentosEfetuados;
 
 	public PagamentoEditForm(Pagamento pagamento) {
 		this.id=(pagamento.getId());
@@ -37,11 +36,8 @@ public class PagamentoEditForm implements Serializable{
 		this.aPagar=(pagamento.getAPagar());
 		this.observacao=(pagamento.getObservacao());
 		this.dataVencimento=(pagamento.getDataVencimento());
+		this.estaQuitado=pagamento.getEstaQuitado();
 		this.listaPagamentosEfetuados =pagamento.getListaPagamentosEfetuados();
-		
-		for (PagamentoEfetuado pagamentoEfetuado : listaPagamentosEfetuados) {
-			System.out.println("pagamento "+ pagamentoEfetuado.getPago());
-		}
 	}
 
 	/**
@@ -63,11 +59,14 @@ public class PagamentoEditForm implements Serializable{
 	
 	private String observacao;
 	
+	private StatusConta estaQuitado;
+	
 	@NotNull
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Calendar dataVencimento;
 
+	private List<PagamentoEfetuado> listaPagamentosEfetuados;
 
 
 }

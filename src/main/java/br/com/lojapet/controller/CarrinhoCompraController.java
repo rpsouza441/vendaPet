@@ -1,7 +1,6 @@
 package br.com.lojapet.controller;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -90,7 +89,6 @@ public class CarrinhoCompraController {
 	// gera pagina finalizar
 	@RequestMapping(value = "fecharCompra")
 	public ModelAndView fecharCompra(Compra compra, HttpServletRequest request) {
-		System.out.println("get");
 
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/compra-realizada/finalizar_compra",
 				"redirect:/compra/procurarProduto");
@@ -109,8 +107,6 @@ public class CarrinhoCompraController {
 	// atualiza a pagina de fechar
 	@RequestMapping(value = "fecharCompra", method = RequestMethod.POST)
 	public ModelAndView atualizaFecharCompra(Compra compra) {
-		System.out.println("post");
-		System.out.println(compra.getSubtotal());
 		ModelAndView modelAndView = redirecionaSeCarrinhoEstaVazio("/compra-realizada/finalizar_compra",
 				"redirect:/compra/procurarProduto");
 		modelAndView.addObject("formaDePagamento", FormaDePagamento.values());
@@ -143,7 +139,6 @@ public class CarrinhoCompraController {
 		}
 		if (request.getParameter("atualizar") != null) {
 			compra.atualizaSubtotal();
-			System.out.println("atualiza");
 			return atualizaFecharCompra(compra);
 			
 		}
@@ -157,10 +152,8 @@ public class CarrinhoCompraController {
 		if (compra.getFornecedor() == null) {
 			result.rejectValue("fornecedor", "field.required");
 		}
-System.out.println("antes dos erros");
 		if (result.hasErrors()) {
 
-			System.out.println(result.getAllErrors());
 			return atualizaFecharCompra(compra);
 		}
 

@@ -64,9 +64,10 @@ public class ClienteController {
 
 	@RequestMapping(value = "gravarCliente", method = RequestMethod.POST)
 	public ModelAndView gravarCliente(@Valid Cliente cliente, BindingResult result) {
-
+		if (clienteService.existeComNomeCompleto(cliente.getNomeCompleto())) {
+			result.rejectValue("nome", "field.cliente.mustBe.Unique");
+		}
 		if (result.hasErrors()) {
-			System.out.println(result.getAllErrors());
 			return form(cliente);
 		}
 

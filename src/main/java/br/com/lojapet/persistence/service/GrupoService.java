@@ -77,4 +77,11 @@ public class GrupoService {
 		return dao.search(q);
 	}
 
+	public boolean existeComNome(String nome) {
+		if (nome != null && nome != "") {
+			return dao.existsByNome(nome);
+		}
+		return false;
+	}
+
 }

@@ -136,6 +136,12 @@ $(document).ready(function() {
 	                  <form:input  path="total" cssClass="form-control money"  placeholder="${totalPlaceHolder}" />
 	                <form:errors path="total" class="text-danger" />
 	                </div>
+	                <div class="form-group col-lg-12">
+	                  <label ><fmt:message key="venda.cadastro.obs" /></label>
+	                  <fmt:message key="venda.cadastro.obsPlaceHolder" var="obsPlaceHolder"/>
+	                  <form:textarea  path="observacao" cssClass="form-control"  placeholder="${obsPlaceHolder}" />
+	                <form:errors path="observacao" class="text-danger" />
+	                </div>
 	               
 	               
 <!-- 	                <div class="form-group col-lg-12"> -->

@@ -65,7 +65,6 @@ public class PagamentoEfetuadoService {
 		return null;
 	}
 
-
 	public PagamentoEfetuado getPagamentoEfetuadoById(UUID id) {
 		try {
 
@@ -100,6 +99,12 @@ public class PagamentoEfetuadoService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public void deletePagamentoEfetuado(List<PagamentoEfetuado> listaPagamentosEfetuados) {
+		for (PagamentoEfetuado pagamentoEfetuado : listaPagamentosEfetuados) {
+			deletePagamentoEfetuado(pagamentoEfetuado.getId());
+		}
 	}
 
 }

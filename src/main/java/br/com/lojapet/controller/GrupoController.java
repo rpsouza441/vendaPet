@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.com.lojapet.model.Grupo;
+import br.com.lojapet.model.User;
 import br.com.lojapet.persistence.service.GrupoService;
 
 @Controller
@@ -64,8 +65,10 @@ public class GrupoController {
 
 	@RequestMapping(value = "gravar", method = RequestMethod.POST)
 	public ModelAndView gravar(@Valid Grupo grupo, BindingResult result) {
+		if (grupoService.existeComNome(grupo.getNome())) {
+			result.rejectValue("nome", "field.mustBe.Unique");
+		}
 		if (result.hasErrors()) {
-			System.out.println(result.getAllErrors());
 			return form(grupo);
 		}
 

@@ -86,6 +86,9 @@ public class ProdutoController {
 	@RequestMapping(value = "/cadastro", method = RequestMethod.POST)
 	public ModelAndView cadastroProduto(MultipartFile endereco, @Valid Produto produto, BindingResult result,
 			RedirectAttributes redirectAttributes) {
+		if (produtoService.existeComNome(produto.getNome())) {
+			result.rejectValue("nome", "field.produto.mustBe.Unique");
+		}
 		if (result.hasErrors()) {
 			return form(produto);
 		}

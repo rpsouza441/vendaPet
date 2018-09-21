@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.com.lojapet.model.Cliente;
-import br.com.lojapet.model.Produto;
 
 public interface ClienteRepository  extends JpaRepository<Cliente, UUID> {
 	
@@ -20,6 +19,8 @@ public interface ClienteRepository  extends JpaRepository<Cliente, UUID> {
 	
 	@Query("SELECT nomeCompleto FROM Cliente where nomeCompleto like %:keyword%")
 	public List<String> autocomplete(@Param("keyword") String keyword);
+
+	public boolean existsByNomeCompleto(String nome);
 	
 
 }

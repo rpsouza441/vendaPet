@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: VendaPet
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: Rodrigo
+Implementation-Vendor-Id: br.com.lojapet
+Build-Jdk: 1.8.0_131
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/VendaPet
+Created-By: Maven Integration for Eclipse
+

@@ -212,7 +212,7 @@
 	              <!-- /.box-body -->
               <div class="box-footer ">
 <!--                 <button type="submit" class="btn btn-default">Cancel</button> -->
-                	<button type="submit" class="btn btn-info pull-right btn-lg btn-block" >
+                	<button type="submit" class="btn btn-primary pull-right btn-lg btn-block" >
 						<fmt:message key="produto.cadastro.salvar" />
 					</button>
 					<div class="clearfix"></div>

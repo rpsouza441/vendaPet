@@ -14,4 +14,6 @@ public interface GrupoRepository extends JpaRepository<Grupo, UUID> {
 	@Query("SELECT g FROM Grupo g where g.nome like %:keyword%")
 	public List<Grupo> search(@Param("keyword") String keyword);
 
+	public boolean existsByNome(String nome);
+
 }

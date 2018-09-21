@@ -91,7 +91,7 @@
         <li><a href="/"><i class="fa fa-dashboard"></i><fmt:message key="navegacao.home" /></a></li>
         <li class="active"><a href="#"><fmt:message key="navegacao.financeiro" /></a></li>
         <li class="active"><a href="#"><fmt:message key="navegacao.controle" /></a></li>
-        <li class="active"><a href="/conta"><fmt:message key="navegacao.contaAPagar" /></a></li>
+        <li class="active"><a href="/conta/paga"><fmt:message key="navegacao.contaAPagar" /></a></li>
       </ol>
     </section>
 
@@ -112,7 +112,7 @@
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            <form:form action="${s:mvcUrl('PC#baixaContaAPagar').build() }" method="post"
+            <form:form action="${s:mvcUrl('PPC#baixaContaAPagar').build() }" method="post"
 					modelAttribute="pagamentoEfetuado" autocomplete="off">
             
 	              <div class="box-body">

@@ -76,11 +76,13 @@ public class CompraRealizadaController {
 		String error = null;
 
 		if (startWith == null) {
-			compras = compraService.getAllCompras();
-		} else {
+			startWith = Calendar.getInstance();
+			startWith.add(Calendar.MONTH, -12);
+			endWith = Calendar.getInstance();
+		}
 			compras = compraService.findCompraBetween(startWith, endWith);
 
-		}
+		
 
 		if (compras.isEmpty() && startWith != null) {
 			error = "error.empty";

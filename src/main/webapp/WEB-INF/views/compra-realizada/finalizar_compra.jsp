@@ -182,6 +182,12 @@ $(document).ready(function() {
                         <form:errors path="dataEmissao" class="text-danger" />
                      </div>
                      <div class="form-group col-lg-12">
+	                  <label ><fmt:message key="compra.cadastro.obs" /></label>
+	                  <fmt:message key="compra.cadastro.obsPlaceHolder" var="obsPlaceHolder"/>
+	                  <form:textarea  path="observacao" cssClass="form-control"  placeholder="${obsPlaceHolder}" />
+	                <form:errors path="observacao" class="text-danger" />
+	                </div>
+                     <div class="form-group col-lg-12">
 		                <label><fmt:message key="compra.cadastro.fornecedor" /></label>
 						<form:select  path="fornecedor.id"  class="form-control select2" >
 						    <option selected="selected">Selecione um Fornecedor</option>

@@ -51,7 +51,7 @@
 							key="navegacao.financeiro" /></a></li>
         <li class="active"><a href="#"><fmt:message
 							key="navegacao.cadastro" /></a></li>
-        <li class="active"><a href="/compra"><fmt:message
+        <li class="active"><a href="/conta/paga"><fmt:message
 							key="navegacao.contaAPagar" /></a></li>
       </ol>
     </section>
@@ -70,7 +70,7 @@
             <!-- /.box-header -->
             <div class="box-body">
             <form:form
-								action="${s:mvcUrl('PC#listaPagaComSearch').build() }"
+								action="${s:mvcUrl('PPC#listaPagaComSearch').build() }"
 								id="form_search" method="post" modelAttribute="startWith"
 								autocomplete="off" data-toggle="validator">
 								
@@ -142,6 +142,7 @@
                 <thead>
 	                <tr>
 	                  <th width="20%"><fmt:message key="conta.responsavel" /></th>
+	                  <th width="20%"><fmt:message key="conta.obs" /></th>
 	                  <th width="15%"><fmt:message key="conta.dataEmissao" /></th>
 	                  <th width="15%"><fmt:message key="conta.dataVencimento" /></th>
 	                  <th width="10%"><fmt:message key="conta.total" /></th>
@@ -157,6 +158,7 @@
                 <c:forEach items="${contas}" var="conta">
                 <tr>
                 <td>${conta.contaPaga.user.nome }  </td>
+                <td>${conta.observacao }  </td>
                 <td><fmt:formatDate type = "date"  dateStyle = "short" timeStyle = "short" value = "${conta.dataEmissao.time }" />
                   <td><fmt:formatDate type = "date"    dateStyle = "short" timeStyle = "short" value = "${conta.dataVencimento.time }" />
                 <td>${conta.total }  </td>
